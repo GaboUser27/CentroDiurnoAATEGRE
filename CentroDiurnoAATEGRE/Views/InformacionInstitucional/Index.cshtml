@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Información Institucional";
+}
+
+<div class="panel-header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-building me-2"></i>Información Institucional</h1>
+                <p class="mb-0">Datos que aparecen en "Quiénes Somos" y "Contacto".</p>
+            </div>
+            <a asp-controller="Home" asp-action="Dashboard" class="btn-secundario"
+               style="border-color:rgba(255,255,255,0.5);color:white;">
+                <i class="bi bi-arrow-left"></i>Panel
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success d-flex align-items-center gap-2 rounded-3 mb-4">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Exito"]
+        </div>
+    }
+
+    @if (Model != null)
+    {
+        <div class="bg-white rounded-3 shadow-sm p-4 p-md-5">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <p class="text-muted small text-uppercase fw-bold mb-1">Título</p>
+                    <p class="fw-semibold">@Model.Titulo</p>
+                </div>
+                <div class="col-md-3">
+                    <p class="text-muted small text-uppercase fw-bold mb-1">Teléfono</p>
+                    <p>@(Model.Telefono ?? "—")</p>
+                </div>
+                <div class="col-md-3">
+                    <p class="text-muted small text-uppercase fw-bold mb-1">Correo</p>
+                    <p>@(Model.Correo ?? "—")</p>
+                </div>
+                <div class="col-12">
+                    <p class="text-muted small text-uppercase fw-bold mb-1">Contenido / Historia</p>
+                    <p style="color:var(--texto-suave);">@Model.Contenido</p>
+                </div>
+                <div class="col-md-6">
+                    <p class="text-muted small text-uppercase fw-bold mb-1">Dirección</p>
+                    <p>@(Model.Direccion ?? "—")</p>
+                </div>
+                <div class="col-md-3">
+                    <p class="text-muted small text-uppercase fw-bold mb-1">Facebook</p>
+                    <p>@(Model.Facebook ?? "—")</p>
+                </div>
+                <div class="col-md-3">
+                    <p class="text-muted small text-uppercase fw-bold mb-1">Instagram</p>
+                    <p>@(Model.Instagram ?? "—")</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <a asp-action="Editar" asp-route-id="@Model.IdInformacion" class="btn-primario">
+                    <i class="bi bi-pencil"></i>Editar información
+                </a>
+            </div>
+        </div>
+    }
+</div>

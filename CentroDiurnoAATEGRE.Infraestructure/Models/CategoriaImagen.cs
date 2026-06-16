@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace CentroDiurnoAATEGRE.Infraestructure.Models;
 
-public partial class CategoriaImagen
+public class CategoriaImagen
 {
+    [Key]
     public int IdCategoriaImagen { get; set; }
 
-    public string Nombre { get; set; } = null!;
+    [Required, MaxLength(100)]
+    public string Nombre { get; set; } = string.Empty;
 
+    [MaxLength(255)]
     public string? Descripcion { get; set; }
 
-    public virtual ICollection<Imagen> Imagen { get; set; } = new List<Imagen>();
+    public ICollection<Imagen> Imagenes { get; set; } = new List<Imagen>();
 }

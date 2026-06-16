@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Acceso Administrativo";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — AATEGRE</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="login-page">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+                    <div class="login-card">
+                        <div class="login-logo">
+                            <img src="./images/logo AATEGRE.png" alt="AATEGRE" />
+                        </div>
+                        <h1 class="login-titulo">Acceso Administrativo</h1>
+                        <p class="login-sub">Ingrese sus credenciales para continuar</p>
+
+                        @if (ViewBag.Error != null)
+                        {
+                            <div class="alert alert-danger d-flex align-items-center gap-2 rounded-3" role="alert">
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                                <span>@ViewBag.Error</span>
+                            </div>
+                        }
+
+                        <form method="post" asp-action="Login" asp-controller="Usuario" class="form-admin">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label" for="correo">
+                                    <i class="bi bi-envelope me-1"></i>Correo electrónico
+                                </label>
+                                <input type="email" id="correo" name="Correo" class="form-control"
+                                       placeholder="usuario@aategre.cr" required autocomplete="email" />
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label" for="contrasena">
+                                    <i class="bi bi-lock me-1"></i>Contraseña
+                                </label>
+                                <div class="input-group">
+                                    <input type="password" id="contrasena" name="Contrasena"
+                                           class="form-control" placeholder="••••••••"
+                                           required autocomplete="current-password" />
+                                    <button class="btn btn-outline-secondary" type="button" id="togglePwd"
+                                            style="border-radius:0 10px 10px 0;border-color:var(--gris-borde);">
+                                        <i class="bi bi-eye" id="eyeIcon"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primario w-100 justify-content-center">
+                                <i class="bi bi-box-arrow-in-right"></i>Iniciar Sesión
+                            </button>
+                        </form>
+
+                        <div class="text-center mt-4">
+                            <a asp-controller="Home" asp-action="Index"
+                               style="color:var(--texto-suave);font-size:0.9rem;" class="d-inline-flex align-items-center gap-1">
+                                <i class="bi bi-arrow-left"></i> Volver al sitio web
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('togglePwd').addEventListener('click', function () {
+            const pwd = document.getElementById('contrasena');
+            const icon = document.getElementById('eyeIcon');
+            pwd.type = pwd.type === 'password' ? 'text' : 'password';
+            icon.className = pwd.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+        });
+    </script>
+</body>
+</html>

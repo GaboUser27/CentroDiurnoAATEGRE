@@ -1,0 +1,69 @@
+﻿@using CentroDiurnoAATEGRE.Application.DTOs
+@model CategoriaImagenDTO
+@{
+    bool esEdicion = Model.IdCategoriaImagen > 0;
+    ViewData["Title"] = esEdicion ? "Editar Categoría" : "Nueva Categoría";
+}
+
+<div class="panel-header">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <a asp-action="Index" class="btn-secundario"
+               style="border-color:rgba(255,255,255,0.5);color:white;">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h1 class="mb-0">
+                <i class="bi bi-folder-@(esEdicion ? "symlink" : "plus") me-2"></i>@ViewData["Title"]
+            </h1>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="bg-white rounded-3 shadow-sm p-4 p-md-5">
+                @if (!esEdicion)
+                {
+                    <div class="mb-4 p-3 rounded-3" style="background:var(--azul-claro);">
+                        <p class="mb-0 small" style="color:var(--azul-oscuro);">
+                            <i class="bi bi-lightbulb-fill me-2"></i>
+                            Al crear una categoría aparecerá automáticamente en la galería pública.
+                            Luego puedes agregarle imágenes.
+                        </p>
+                    </div>
+                }
+                <form method="post" asp-action="@(esEdicion ? "Editar" : "Crear")"
+                      asp-route-id="@Model.IdCategoriaImagen" class="form-admin">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-4">
+                        <label class="form-label" asp-for="Nombre">
+                            <i class="bi bi-folder me-1"></i>Nombre de la categoría
+                        </label>
+                        <input asp-for="Nombre" class="form-control"
+                               placeholder="Ej: Actividades Deportivas" maxlength="100" required />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-5">
+                        <label class="form-label" asp-for="Descripcion">
+                            <i class="bi bi-text-paragraph me-1"></i>Descripción
+                            <span class="text-muted fw-normal">(opcional)</span>
+                        </label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"
+                                  placeholder="Describe qué tipo de imágenes tendrá esta categoría..."
+                                  maxlength="255"></textarea>
+                    </div>
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn-secundario">
+                            <i class="bi bi-x-circle"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn-primario">
+                            <i class="bi bi-@(esEdicion ? "check-circle" : "folder-plus")"></i>
+                            @(esEdicion ? "Guardar cambios" : "Crear categoría")
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

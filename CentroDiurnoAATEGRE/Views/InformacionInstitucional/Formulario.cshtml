@@ -1,0 +1,113 @@
+﻿@using CentroDiurnoAATEGRE.Application.DTOs
+@model InformacionInstitucionalDTO
+@{
+    bool esEdicion = Model.IdInformacion > 0;
+    ViewData["Title"] = esEdicion ? "Editar Información" : "Crear Información";
+}
+
+<div class="panel-header">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <a asp-action="Index" class="btn-secundario"
+               style="border-color:rgba(255,255,255,0.5);color:white;">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h1 class="mb-0">
+                <i class="bi bi-building me-2"></i>@ViewData["Title"]
+            </h1>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="bg-white rounded-3 shadow-sm p-4 p-md-5">
+                <form method="post" asp-action="@(esEdicion ? "Editar" : "Crear")"
+                      asp-route-id="@Model.IdInformacion" class="form-admin">
+                    @Html.AntiForgeryToken()
+
+                    <h5 class="mb-3" style="font-family:'Playfair Display',serif;color:var(--azul-oscuro);">
+                        <i class="bi bi-info-circle me-2"></i>Información General
+                    </h5>
+                    <div class="mb-3">
+                        <label class="form-label" asp-for="Titulo">
+                            <i class="bi bi-fonts me-1"></i>Título del Centro
+                        </label>
+                        <input asp-for="Titulo" class="form-control"
+                               placeholder="Ej: AATEGRE Centro Diurno" required />
+                        <span asp-validation-for="Titulo" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" asp-for="Contenido">
+                            <i class="bi bi-text-paragraph me-1"></i>Historia y descripción
+                        </label>
+                        <textarea asp-for="Contenido" class="form-control" rows="6"
+                                  placeholder="Describa la historia, misión y visión del centro..." required></textarea>
+                        <span asp-validation-for="Contenido" class="text-danger small"></span>
+                    </div>
+
+                    <hr style="border-color:var(--gris-borde);" class="my-4" />
+
+                    <h5 class="mb-3" style="font-family:'Playfair Display',serif;color:var(--azul-oscuro);">
+                        <i class="bi bi-telephone me-2"></i>Datos de Contacto
+                    </h5>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label" asp-for="Telefono">
+                                <i class="bi bi-telephone me-1"></i>Teléfono
+                            </label>
+                            <input asp-for="Telefono" class="form-control" placeholder="+506 2494-XXXX" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" asp-for="Correo">
+                                <i class="bi bi-envelope me-1"></i>Correo electrónico
+                            </label>
+                            <input asp-for="Correo" type="email" class="form-control"
+                                   placeholder="info@aategre.cr" />
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label" asp-for="Direccion">
+                            <i class="bi bi-geo-alt me-1"></i>Dirección
+                        </label>
+                        <input asp-for="Direccion" class="form-control"
+                               placeholder="Ej: 100m norte de la Plaza de Grecia, Alajuela" />
+                    </div>
+
+                    <hr style="border-color:var(--gris-borde);" class="my-4" />
+
+                    <h5 class="mb-3" style="font-family:'Playfair Display',serif;color:var(--azul-oscuro);">
+                        <i class="bi bi-share me-2"></i>Redes Sociales
+                    </h5>
+                    <div class="row g-3 mb-5">
+                        <div class="col-md-6">
+                            <label class="form-label" asp-for="Facebook">
+                                <i class="bi bi-facebook me-1" style="color:#1877F2;"></i>Facebook (URL)
+                            </label>
+                            <input asp-for="Facebook" type="url" class="form-control"
+                                   placeholder="https://facebook.com/aategre" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" asp-for="Instagram">
+                                <i class="bi bi-instagram me-1" style="color:#E1306C;"></i>Instagram (URL)
+                            </label>
+                            <input asp-for="Instagram" type="url" class="form-control"
+                                   placeholder="https://instagram.com/aategre" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn-secundario">
+                            <i class="bi bi-x-circle"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn-primario">
+                            <i class="bi bi-check-circle"></i>
+                            @(esEdicion ? "Guardar cambios" : "Crear información")
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,121 @@
+﻿@using CentroDiurnoAATEGRE.Application.DTOs
+@model UsuarioDTO
+@{
+    bool esEdicion = Model.IdUsuario > 0;
+    ViewData["Title"] = esEdicion ? "Editar Usuario" : "Nuevo Usuario";
+}
+
+<div class="panel-header">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <a asp-action="Index" class="btn-secundario"
+               style="border-color:rgba(255,255,255,0.5);color:white;">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h1 class="mb-0">
+                <i class="bi bi-person-@(esEdicion ? "gear" : "plus") me-2"></i>@ViewData["Title"]
+            </h1>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="bg-white rounded-3 shadow-sm p-4 p-md-5">
+                <form method="post" asp-action="@(esEdicion ? "Editar" : "Crear")"
+                      asp-route-id="@Model.IdUsuario" class="form-admin">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label" asp-for="Nombre">
+                                <i class="bi bi-person me-1"></i>Nombre completo
+                            </label>
+                            <input asp-for="Nombre" class="form-control"
+                                   placeholder="Ej: María González Vargas" maxlength="100" required />
+                            <span asp-validation-for="Nombre" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label" asp-for="Correo">
+                                <i class="bi bi-envelope me-1"></i>Correo electrónico
+                            </label>
+                            <input asp-for="Correo" type="email" class="form-control"
+                                   placeholder="usuario@aategre.cr" required />
+                            <span asp-validation-for="Correo" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label" asp-for="IdRol">
+                                <i class="bi bi-shield-check me-1"></i>Rol
+                            </label>
+                            <select asp-for="IdRol" asp-items="ViewBag.Roles" class="form-select" required>
+                                <option value="">— Seleccione —</option>
+                            </select>
+                            <span asp-validation-for="IdRol" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-7">
+                            <label class="form-label" asp-for="Contrasena">
+                                <i class="bi bi-lock me-1"></i>Contraseña
+                                @if (esEdicion) { <span class="text-muted fw-normal">(dejar vacío para no cambiar)</span> }
+                            </label>
+                            <div class="input-group">
+                                @if (!esEdicion)
+                                {
+                                    <input asp-for="Contrasena"
+                                           type="password"
+                                           id="pwdField"
+                                           class="form-control"
+                                           placeholder="Mínimo 6 caracteres"
+                                           required
+                                           minlength="6" />
+                                }
+                                else
+                                {
+                                    <input asp-for="Contrasena"
+                                           type="password"
+                                           id="pwdField"
+                                           class="form-control"
+                                           placeholder="Nueva contraseña (opcional)"
+                                           minlength="6" />
+                                }
+                                <button class="btn btn-outline-secondary" type="button" id="togglePwd"
+                                        style="border-radius:0 10px 10px 0;border-color:var(--gris-borde);">
+                                    <i class="bi bi-eye" id="eyeIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label" asp-for="IdEstadoUsuario">
+                                <i class="bi bi-toggle-on me-1"></i>Estado de la cuenta
+                            </label>
+                            <select asp-for="IdEstadoUsuario" asp-items="ViewBag.Estados"
+                                    class="form-select" required></select>
+                            <span asp-validation-for="IdEstadoUsuario" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <hr class="my-4" style="border-color:var(--gris-borde);" />
+                    <div class="d-flex gap-3 justify-content-end">
+                        <a asp-action="Index" class="btn-secundario">
+                            <i class="bi bi-x-circle"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn-primario">
+                            <i class="bi bi-@(esEdicion ? "check-circle" : "person-plus")"></i>
+                            @(esEdicion ? "Guardar cambios" : "Crear usuario")
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('togglePwd')?.addEventListener('click', function () {
+            const pwd = document.getElementById('pwdField');
+            const icon = document.getElementById('eyeIcon');
+            pwd.type = pwd.type === 'password' ? 'text' : 'password';
+            icon.className = pwd.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+        });
+    </script>
+}

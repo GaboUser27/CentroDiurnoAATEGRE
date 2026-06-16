@@ -1,8 +1,333 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
+    ViewData["ActivePage"] = "Index";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero">
+    <div class="hero-formas">
+        <div class="hero-circulo hero-circulo-1"></div>
+        <div class="hero-circulo hero-circulo-2"></div>
+        <div class="hero-circulo hero-circulo-3"></div>
+        <div class="hero-lila"></div>
+    </div>
+    <div class="container py-5">
+        <div class="row align-items-center gy-5">
+            <div class="col-lg-7 hero-contenido">
+                <div class="hero-eyebrow fade-in-up">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                    Centro Diurno · Grecia, Alajuela
+                </div>
+                <h1 class="hero-titulo fade-in-up delay-1">
+                    Un espacio de
+                    <span>amor y cuidado</span>
+                    para quienes más queremos
+                </h1>
+                <p class="hero-descripcion fade-in-up delay-2">
+                    En AATEGRE brindamos atención integral a nuestros adultos mayores, combinando
+                    cuidado profesional con actividades que nutren el cuerpo, la mente y el espíritu.
+                </p>
+                <div class="hero-botones fade-in-up delay-3">
+                    <a asp-controller="Home" asp-action="QuienesSomos" class="btn-primario">
+                        <i class="bi bi-people-fill"></i>Conócenos
+                    </a>
+                    <a asp-controller="Home" asp-action="Contacto" class="btn-secundario"
+                       style="border-color:rgba(255,255,255,0.6); color:var(--blanco);">
+                        <i class="bi bi-telephone"></i>Contáctenos
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 hero-imagen-col fade-in-up delay-4">
+                <div class="hero-card-flotante">
+                    <div class="hero-icono-grande">
+                        <i class="bi bi-suit-heart-fill" style="color:var(--lila)"></i>
+                    </div>
+                    <h3 class="text-center mb-1" style="font-family:'Playfair Display',serif; font-size:1.3rem; color:white;">
+                        Cuidado con alma
+                    </h3>
+                    <p class="text-center mb-0" style="font-size:0.88rem; color:rgba(255,255,255,0.75); line-height:1.5;">
+                        Cada adulto mayor merece un espacio donde se sienta valorado, escuchado y pleno.
+                    </p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-num">+15</div>
+                            <div class="hero-stat-label">Años de experiencia</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-num">100%</div>
+                            <div class="hero-stat-label">Dedicación</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-num">5</div>
+                            <div class="hero-stat-label">Días a la semana</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-num">❤️</div>
+                            <div class="hero-stat-label">Con amor siempre</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="seccion-avisos">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="text-uppercase fw-bold" style="color:var(--azul); font-size:0.85rem; letter-spacing:.1em;">
+                <i class="bi bi-megaphone-fill me-2"></i>Información relevante
+            </p>
+            <h2 class="seccion-titulo">Avisos y Comunicados</h2>
+            <div class="linea-acento mx-auto"></div>
+            <p class="seccion-subtitulo mt-3">Mantente al tanto de las últimas noticias del Centro Diurno.</p>
+        </div>
+        <div class="row g-4">
+            @if (ViewBag.Avisos != null && ((IEnumerable<dynamic>)ViewBag.Avisos).Any())
+            {
+                foreach (var aviso in ViewBag.Avisos)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="aviso-card">
+                            <div class="aviso-badge"><i class="bi bi-bell-fill"></i> Aviso</div>
+                            <h4 class="aviso-titulo">@aviso.Titulo</h4>
+                            <p class="aviso-contenido">@aviso.Contenido</p>
+                            <div class="aviso-fecha">
+                                <i class="bi bi-calendar3"></i>
+                                Publicado: @aviso.FechaPublicacion.ToString("dd/MM/yyyy")
+                                @if (aviso.FechaExpiracion != null)
+                                {
+                                    <span class="ms-2"><i class="bi bi-clock"></i> Vence: @aviso.FechaExpiracion.ToString("dd/MM/yyyy")</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="aviso-card">
+                        <div class="aviso-badge"><i class="bi bi-bell-fill"></i> Aviso</div>
+                        <h4 class="aviso-titulo">Actividades de Semana Santa</h4>
+                        <p class="aviso-contenido">Durante Semana Santa el Centro permanecerá cerrado del Jueves 17 al Domingo 20 de abril.</p>
+                        <div class="aviso-fecha"><i class="bi bi-calendar3"></i> Publicado: 10/04/2025</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="aviso-card urgente">
+                        <div class="aviso-badge lila-badge"><i class="bi bi-star-fill"></i> Especial</div>
+                        <h4 class="aviso-titulo">Jornada de Salud Gratuita</h4>
+                        <p class="aviso-contenido">El próximo viernes realizaremos una jornada de salud con control de presión y glucosa.</p>
+                        <div class="aviso-fecha"><i class="bi bi-calendar3"></i> Publicado: 12/04/2025</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="aviso-card">
+                        <div class="aviso-badge"><i class="bi bi-bell-fill"></i> Aviso</div>
+                        <h4 class="aviso-titulo">Horario Extendido en Julio</h4>
+                        <p class="aviso-contenido">Durante julio ampliaremos nuestro horario hasta las 5:00 p.m.</p>
+                        <div class="aviso-fecha"><i class="bi bi-calendar3"></i> Publicado: 01/06/2025</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="seccion-quienes">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-5">
+                <div class="quienes-imagen-wrap">
+                    <div class="quienes-imagen-bg"><span>🤝</span></div>
+                    <div class="quienes-badge-flotante">
+                        <div class="quienes-badge-icono">❤️</div>
+                        <div class="quienes-badge-texto">
+                            <strong>+15</strong>
+                            <span>años de servicio</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <p class="text-uppercase fw-bold mb-2" style="color:var(--azul); font-size:0.85rem; letter-spacing:.1em;">
+                    <i class="bi bi-award-fill me-1"></i>Nuestra historia
+                </p>
+                <h2 class="seccion-titulo">¿Quiénes Somos?</h2>
+                <div class="linea-acento izquierda mb-4"></div>
+                <p style="color:var(--texto-suave); font-size:1.05rem; line-height:1.8;">
+                    AATEGRE Centro Diurno es un espacio dedicado al bienestar integral de los adultos mayores de
+                    la zona de Grecia, Alajuela.
+                </p>
+                <ul class="valores-lista mt-4">
+                    <li>
+                        <div class="valor-icono"><i class="bi bi-heart-fill"></i></div>
+                        <span><strong>Calidez humana</strong> — Cada persona es tratada con respeto, amor y dignidad.</span>
+                    </li>
+                    <li>
+                        <div class="valor-icono"><i class="bi bi-shield-check"></i></div>
+                        <span><strong>Seguridad</strong> — Un entorno físico y emocional seguro para todos.</span>
+                    </li>
+                    <li>
+                        <div class="valor-icono"><i class="bi bi-stars"></i></div>
+                        <span><strong>Calidad</strong> — Servicios profesionales con estándares de excelencia.</span>
+                    </li>
+                    <li>
+                        <div class="valor-icono"><i class="bi bi-people-fill"></i></div>
+                        <span><strong>Comunidad</strong> — Fomentamos el vínculo social y la pertenencia.</span>
+                    </li>
+                </ul>
+                <a asp-controller="Home" asp-action="QuienesSomos" class="btn-primario mt-4">
+                    <i class="bi bi-arrow-right-circle"></i>Leer más sobre nosotros
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="seccion-servicios">
+    <div class="container">
+        <div class="text-center mb-5">
+            <p class="text-uppercase fw-bold" style="color:var(--azul); font-size:0.85rem; letter-spacing:.1em;">
+                <i class="bi bi-grid-3x3-gap-fill me-2"></i>Lo que ofrecemos
+            </p>
+            <h2 class="seccion-titulo">Nuestros Servicios</h2>
+            <div class="linea-acento mx-auto"></div>
+        </div>
+        <div class="row g-4">
+            <div class="col-sm-6 col-lg-4">
+                <div class="servicio-card">
+                    <div class="servicio-icono-wrap servicio-icono-azul"><i class="bi bi-heart-pulse-fill"></i></div>
+                    <h4 class="servicio-titulo">Atención Médica</h4>
+                    <p class="servicio-desc">Control periódico de salud, seguimiento de enfermedades crónicas y atención preventiva.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="servicio-card">
+                    <div class="servicio-icono-wrap servicio-icono-verde"><i class="bi bi-person-walking"></i></div>
+                    <h4 class="servicio-titulo">Terapia Física</h4>
+                    <p class="servicio-desc">Ejercicios adaptados para mejorar la movilidad, el equilibrio y la fuerza muscular.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="servicio-card">
+                    <div class="servicio-icono-wrap servicio-icono-lila"><i class="bi bi-music-note-beamed"></i></div>
+                    <h4 class="servicio-titulo">Actividades Recreativas</h4>
+                    <p class="servicio-desc">Manualidades, música, baile y juegos que estimulan la mente y generan alegría.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="servicio-card">
+                    <div class="servicio-icono-wrap servicio-icono-naranja"><i class="bi bi-egg-fried"></i></div>
+                    <h4 class="servicio-titulo">Nutrición y Alimentación</h4>
+                    <p class="servicio-desc">Alimentación balanceada con menús elaborados por profesionales en nutrición.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="servicio-card">
+                    <div class="servicio-icono-wrap servicio-icono-teal"><i class="bi bi-brain"></i></div>
+                    <h4 class="servicio-titulo">Estimulación Cognitiva</h4>
+                    <p class="servicio-desc">Talleres de memoria, lectura y actividades que mantienen la mente activa y ágil.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="servicio-card">
+                    <div class="servicio-icono-wrap servicio-icono-indigo"><i class="bi bi-chat-heart-fill"></i></div>
+                    <h4 class="servicio-titulo">Apoyo Emocional</h4>
+                    <p class="servicio-desc">Acompañamiento psicológico y espiritual para el bienestar integral de cada persona.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="seccion-galeria">
+    <div class="container">
+        <div class="row align-items-end mb-4">
+            <div class="col-lg-7">
+                <h2 class="seccion-titulo">Nuestras Actividades</h2>
+                <div class="linea-acento izquierda mb-3"></div>
+                <p style="color:var(--texto-suave);">Cada día está lleno de sonrisas, aprendizaje y convivencia.</p>
+            </div>
+            <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+                <a asp-controller="Imagen" asp-action="Galeria" class="btn-primario">
+                    <i class="bi bi-collection"></i>Ver galería completa
+                </a>
+            </div>
+        </div>
+        <div class="galeria-grid">
+            <div class="galeria-item grande">
+                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Actividades deportivas</span></div>
+                <div class="galeria-overlay">🏃 Terapia física y ejercicio</div>
+            </div>
+            <div class="galeria-item">
+                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Celebración navideña</span></div>
+                <div class="galeria-overlay">🎄 Navidad 2024</div>
+            </div>
+            <div class="galeria-item">
+                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Día del adulto mayor</span></div>
+                <div class="galeria-overlay">🎉 Celebración especial</div>
+            </div>
+            <div class="galeria-item">
+                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Taller de manualidades</span></div>
+                <div class="galeria-overlay">🎨 Creatividad y arte</div>
+            </div>
+            <div class="galeria-item">
+                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Música y baile</span></div>
+                <div class="galeria-overlay">🎵 Momentos de alegría</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="seccion-contacto">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="seccion-titulo">Información de Contacto</h2>
+            <div class="linea-acento mx-auto"></div>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-sm-6 col-lg-3">
+                <div class="contacto-card">
+                    <div class="contacto-icono ci-azul"><i class="bi bi-geo-alt-fill"></i></div>
+                    <div>
+                        <p class="contacto-info-titulo">Dirección</p>
+                        <p class="contacto-info-dato">Grecia, Alajuela, Costa Rica</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="contacto-card">
+                    <div class="contacto-icono ci-lila"><i class="bi bi-telephone-fill"></i></div>
+                    <div>
+                        <p class="contacto-info-titulo">Teléfono</p>
+                        <p class="contacto-info-dato">+506 2494-XXXX</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="contacto-card">
+                    <div class="contacto-icono ci-verde"><i class="bi bi-envelope-fill"></i></div>
+                    <div>
+                        <p class="contacto-info-titulo">Correo electrónico</p>
+                        <p class="contacto-info-dato">info@aategre.cr</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="contacto-card">
+                    <div class="contacto-icono ci-naranja"><i class="bi bi-clock-fill"></i></div>
+                    <div>
+                        <p class="contacto-info-titulo">Horario</p>
+                        <p class="contacto-info-dato">Lun – Vie · 7:00 a.m. – 4:00 p.m.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a asp-controller="Home" asp-action="Contacto" class="btn-primario">
+                <i class="bi bi-envelope-heart"></i>Ver página de contacto completa
+            </a>
+        </div>
+    </div>
+</section>

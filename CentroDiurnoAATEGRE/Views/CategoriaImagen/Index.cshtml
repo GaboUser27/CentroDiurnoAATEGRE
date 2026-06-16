@@ -1,0 +1,88 @@
+﻿@{
+    ViewData["Title"] = "Categorías de Galería";
+}
+
+<div class="panel-header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-folder2-open me-2"></i>Categorías de Galería</h1>
+                <p class="mb-0">Cada categoría aparece como sección dentro de la galería pública.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-controller="Imagen" asp-action="Index" class="btn-secundario"
+                   style="border-color:rgba(255,255,255,0.5);color:white;">
+                    <i class="bi bi-images"></i>Galería
+                </a>
+                <a asp-action="Crear" class="btn-primario" style="background:white;color:var(--azul);">
+                    <i class="bi bi-folder-plus"></i>Nueva Categoría
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success d-flex align-items-center gap-2 rounded-3 mb-4">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Exito"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger d-flex align-items-center gap-2 rounded-3 mb-4">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+        </div>
+    }
+
+    <div class="row g-4">
+        @if (Model != null)
+        {
+            foreach (var cat in Model)
+            {
+                <div class="col-sm-6 col-lg-4">
+                    <div class="bg-white rounded-3 shadow-sm p-4 h-100">
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div style="width:52px;height:52px;background:var(--azul-claro);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--azul);flex-shrink:0;">
+                                <i class="bi bi-folder-fill"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0" style="font-family:'Playfair Display',serif;">@cat.Nombre</h5>
+                                <small class="text-muted">@cat.Imagenes.Count imagen(es)</small>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(cat.Descripcion))
+                        {
+                            <p class="text-muted small mb-3">@cat.Descripcion</p>
+                        }
+                        <div class="d-flex gap-2">
+                            <a asp-controller="Imagen" asp-action="Galeria"
+                               asp-route-categoriaId="@cat.IdCategoriaImagen"
+                               class="btn btn-sm btn-outline-secondary rounded-2 flex-fill text-center" target="_blank">
+                                <i class="bi bi-eye me-1"></i>Ver en sitio
+                            </a>
+                            <a asp-action="Editar" asp-route-id="@cat.IdCategoriaImagen"
+                               class="btn btn-sm btn-outline-primary rounded-2">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a asp-action="Eliminar" asp-route-id="@cat.IdCategoriaImagen"
+                               class="btn btn-sm btn-outline-danger rounded-2"
+                               onclick="return confirm('¿Eliminar esta categoría?')">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-folder2" style="font-size:4rem;color:var(--gris-borde);"></i>
+                <h5 class="mt-3 text-muted">No hay categorías creadas.</h5>
+                <a asp-action="Crear" class="btn-primario mt-2"><i class="bi bi-folder-plus"></i>Crear primera categoría</a>
+            </div>
+        }
+    </div>
+</div>

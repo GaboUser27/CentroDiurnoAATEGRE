@@ -1,0 +1,23 @@
+﻿
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CentroDiurnoAATEGRE.Infraestructure.Models;
+using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
+using CentroDiurnoAATEGRE.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations
+{
+    public class CategoriaImagenRepository : GenericRepository<CategoriaImagen>, ICategoriaImagenRepository
+    {
+        public CategoriaImagenRepository(AategreeDbContext context) : base(context) { }
+
+        public async Task<IEnumerable<CategoriaImagen>> ObtenerConImagenesAsync() =>
+            await _context.CategoriasImagen
+                .Include(c => c.Imagenes)
+                .ToListAsync();
+    }
+}

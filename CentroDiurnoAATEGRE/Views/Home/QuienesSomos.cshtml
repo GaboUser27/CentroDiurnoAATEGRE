@@ -1,0 +1,95 @@
+﻿@{
+    ViewData["Title"] = "Quiénes Somos";
+    ViewData["ActivePage"] = "Quienes";
+    var info = ViewBag.Informacion;
+}
+
+<div style="background:linear-gradient(135deg,var(--azul-oscuro),var(--azul));padding:5rem 0 4rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:white;clip-path:ellipse(55% 100% at 50% 100%);"></div>
+    <div class="container text-center position-relative">
+        <div class="hero-eyebrow d-inline-flex mb-3">
+            <i class="bi bi-people-fill me-2"></i>Nuestra historia
+        </div>
+        <h1 style="font-family:'Playfair Display',serif;color:white;font-size:clamp(1.8rem,4vw,2.8rem);">
+            Quiénes Somos
+        </h1>
+        <p style="color:rgba(255,255,255,.75);max-width:520px;margin:.75rem auto 0;">
+            Conoce la historia, misión y valores de AATEGRE Centro Diurno.
+        </p>
+    </div>
+</div>
+
+<section class="seccion-quienes" style="padding-top:5rem;">
+    <div class="container">
+        <div class="row align-items-center g-5 mb-5">
+            <div class="col-lg-5">
+                <div class="quienes-imagen-bg" style="max-width:100%;"><span>🤝</span></div>
+            </div>
+            <div class="col-lg-7">
+                <p class="text-uppercase fw-bold mb-2" style="color:var(--azul);font-size:.85rem;letter-spacing:.1em;">
+                    <i class="bi bi-building me-1"></i>El Centro
+                </p>
+                <h2 class="seccion-titulo">@(info?.Titulo ?? "AATEGRE Centro Diurno")</h2>
+                <div class="linea-acento izquierda mb-4"></div>
+                <div style="color:var(--texto-suave);font-size:1.05rem;line-height:1.85;">
+                    @if (info?.Contenido != null)
+                    {
+                        @Html.Raw(info.Contenido.Replace("\n", "<br/>"))
+                    }
+                    else
+                    {
+                        <p>
+                            AATEGRE Centro Diurno es un espacio dedicado al bienestar integral de los adultos mayores de
+                            la zona de Grecia, Alajuela.
+                        </p>
+                        <p class="mt-3">
+                            Contamos con un equipo multidisciplinario comprometido con brindar atención médica,
+                            recreación, nutrición y acompañamiento emocional en un entorno seguro y cálido.
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-5 mt-5">
+            <h2 class="seccion-titulo">Nuestros Valores</h2>
+            <div class="linea-acento mx-auto"></div>
+        </div>
+        <div class="row g-4 mb-5">
+            <div class="col-sm-6 col-lg-3">
+                <div class="servicio-card text-center">
+                    <div class="servicio-icono-wrap servicio-icono-lila mx-auto"><i class="bi bi-heart-fill"></i></div>
+                    <h5 class="servicio-titulo">Amor</h5>
+                    <p class="servicio-desc">Actuamos desde el amor genuino hacia cada adulto mayor y su familia.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="servicio-card text-center">
+                    <div class="servicio-icono-wrap servicio-icono-azul mx-auto"><i class="bi bi-shield-check"></i></div>
+                    <h5 class="servicio-titulo">Respeto</h5>
+                    <p class="servicio-desc">Honramos la historia, experiencia y dignidad de cada persona.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="servicio-card text-center">
+                    <div class="servicio-icono-wrap servicio-icono-verde mx-auto"><i class="bi bi-stars"></i></div>
+                    <h5 class="servicio-titulo">Excelencia</h5>
+                    <p class="servicio-desc">Buscamos constantemente la mejora en cada servicio que ofrecemos.</p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="servicio-card text-center">
+                    <div class="servicio-icono-wrap servicio-icono-naranja mx-auto"><i class="bi bi-people-fill"></i></div>
+                    <h5 class="servicio-titulo">Comunidad</h5>
+                    <p class="servicio-desc">Creamos lazos de amistad, pertenencia y apoyo mutuo.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <a asp-controller="Home" asp-action="Contacto" class="btn-primario">
+                <i class="bi bi-envelope-heart"></i>Contáctenos
+            </a>
+        </div>
+    </div>
+</section>

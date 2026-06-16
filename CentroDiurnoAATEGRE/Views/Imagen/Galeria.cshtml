@@ -1,0 +1,106 @@
+﻿@{
+    ViewData["Title"] = "Galería de Actividades";
+    ViewData["ActivePage"] = "Actividades";
+}
+
+<div style="background:linear-gradient(135deg,var(--azul-oscuro),var(--azul));padding:5rem 0 3rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:white;clip-path:ellipse(55% 100% at 50% 100%);"></div>
+    <div class="container text-center position-relative">
+        <div class="hero-eyebrow d-inline-flex mb-3">
+            <i class="bi bi-images me-2"></i>Momentos especiales
+        </div>
+        <h1 style="font-family:'Playfair Display',serif;color:white;font-size:clamp(1.8rem,4vw,2.8rem);">
+            Galería de Actividades
+        </h1>
+        <p style="color:rgba(255,255,255,.75);max-width:520px;margin:.75rem auto 0;">
+            Descubre los momentos de alegría, aprendizaje y convivencia que vivimos cada día.
+        </p>
+    </div>
+</div>
+
+<div class="container py-5">
+    @if (ViewBag.Categorias != null)
+    {
+        <div class="text-center mb-5">
+            <h5 class="mb-3" style="font-family:'Playfair Display',serif;color:var(--azul-oscuro);">Filtrar por categoría</h5>
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                <a href="@Url.Action("Galeria")"
+                   class="categoria-chip @(ViewBag.CategoriaActual == null ? "activo" : "")">
+                    <i class="bi bi-grid-fill"></i>Todas
+                </a>
+                @foreach (var cat in ViewBag.Categorias)
+                {
+                    <a href="@Url.Action("Galeria", new { categoriaId = cat.IdCategoriaImagen })"
+                       class="categoria-chip @(ViewBag.CategoriaActual == cat.IdCategoriaImagen ? "activo" : "")">
+                        <i class="bi bi-folder-fill"></i>@cat.Nombre
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    @if (ViewBag.CategoriaActual != null && ViewBag.NombreCategoria != null)
+    {
+        <div class="mb-4">
+            <h4 style="font-family:'Playfair Display',serif;color:var(--azul-oscuro);">
+                <i class="bi bi-folder-open-fill me-2" style="color:var(--lila)"></i>@ViewBag.NombreCategoria
+            </h4>
+            @if (ViewBag.DescripcionCategoria != null)
+            {
+                <p style="color:var(--texto-suave);">@ViewBag.DescripcionCategoria</p>
+            }
+        </div>
+    }
+
+    @if (Model != null && ((IEnumerable<dynamic>)Model).Any())
+    {
+        <div class="row g-3">
+            @foreach (var img in Model)
+            {
+                <div class="col-sm-6 col-md-4 col-lg-3">
+                    <div class="galeria-item" style="aspect-ratio:1;border-radius:12px;overflow:hidden;cursor:pointer;"
+                         data-bs-toggle="modal" data-bs-target="#modalImagen"
+                         onclick="verImagen('@img.RutaArchivo','@img.Titulo','@img.Descripcion')">
+                        <img src="~/uploads/@img.RutaArchivo" alt="@img.Titulo"
+                             style="width:100%;height:100%;object-fit:cover;" />
+                        <div class="galeria-overlay">📷 @img.Titulo</div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-images" style="font-size:4rem;color:var(--gris-borde);"></i>
+            <h5 class="mt-3" style="color:var(--texto-suave);">Próximamente más fotos</h5>
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="modalImagen" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 rounded-4 overflow-hidden">
+            <div class="modal-header border-0" style="background:var(--azul);color:white;padding:1rem 1.5rem;">
+                <h5 class="modal-title" id="modalTitulo" style="font-family:'Playfair Display',serif;"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0 text-center" style="background:#1a1a2e;">
+                <img id="modalFoto" src="" alt="" style="max-width:100%;max-height:75vh;object-fit:contain;" />
+            </div>
+            <div class="modal-footer border-0" style="padding:1rem 1.5rem;">
+                <p id="modalDesc" class="text-muted mb-0 small"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function verImagen(ruta, titulo, descripcion) {
+            document.getElementById('modalFoto').src = '/uploads/' + ruta;
+            document.getElementById('modalTitulo').textContent = titulo;
+            document.getElementById('modalDesc').textContent = descripcion || '';
+        }
+    </script>
+}

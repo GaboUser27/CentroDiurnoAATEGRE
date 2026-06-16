@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<div class="panel-header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-people me-2"></i>Gestión de Usuarios</h1>
+                <p class="mb-0">Administra las cuentas de los funcionarios del Centro Diurno.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-controller="Home" asp-action="Dashboard" class="btn-secundario"
+                   style="border-color:rgba(255,255,255,0.5);color:white;">
+                    <i class="bi bi-arrow-left"></i>Panel
+                </a>
+                <a asp-action="Crear" class="btn-primario" style="background:white;color:var(--azul);">
+                    <i class="bi bi-person-plus-fill"></i>Nuevo Usuario
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success d-flex align-items-center gap-2 rounded-3 mb-4">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Exito"]
+        </div>
+    }
+
+    <div class="bg-white rounded-3 shadow-sm p-4">
+        <div class="table-responsive">
+            <table class="tabla-admin">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Correo electrónico</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null)
+                    {
+                        var i = 1;
+                        foreach (var usuario in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">@(i++)</td>
+                                <td class="fw-semibold">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div style="width:34px;height:34px;background:var(--azul-claro);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--azul);font-size:.85rem;flex-shrink:0;">
+                                            @(usuario.Nombre?.Substring(0, 1).ToUpper())
+                                        </div>
+                                        @usuario.Nombre
+                                    </div>
+                                </td>
+                                <td>@usuario.Correo</td>
+                                <td>
+                                    <span style="background:var(--azul-claro);color:var(--azul);padding:.2rem .7rem;border-radius:50px;font-size:.8rem;font-weight:600;">
+                                        @usuario.Rol?.Nombre
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (usuario.EstadoUsuario?.Nombre == "Activo")
+                                    {
+                                        <span class="badge-activo">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-inactivo">Inactivo</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a asp-action="Editar" asp-route-id="@usuario.IdUsuario"
+                                           class="btn btn-sm btn-outline-primary rounded-2" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="CambiarEstado" asp-route-id="@usuario.IdUsuario"
+                                           class="btn btn-sm @(usuario.EstadoUsuario?.Nombre == "Activo" ? "btn-outline-warning" : "btn-outline-success") rounded-2">
+                                            <i class="bi bi-toggle-@(usuario.EstadoUsuario?.Nombre == "Activo" ? "on" : "off")"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center py-5 text-muted">No hay usuarios registrados.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

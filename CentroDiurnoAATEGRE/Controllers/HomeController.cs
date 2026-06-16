@@ -1,83 +1,72 @@
-using System.Diagnostics;
-using System.Text.Json;
-using CentroDiurnoAATEGRE.Models;
-using CentroDiurnoAATEGRE.Web.Models;
+using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Libreria.Web.Controllers
+namespace CentroDiurnoAATEGRE.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IAvisoRepository _avisoRepo;
+        private readonly IInformacionInstitucionalRepository _infoRepo;
+        private readonly IUsuarioRepository _usuarioRepo;
+        private readonly IImagenRepository _imagenRepo;
+        private readonly ICategoriaImagenRepository _categoriaRepo;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(
+            IAvisoRepository avisoRepo,
+            IInformacionInstitucionalRepository infoRepo,
+            IUsuarioRepository usuarioRepo,
+            IImagenRepository imagenRepo,
+            ICategoriaImagenRepository categoriaRepo)
         {
-            _logger = logger;
+            _avisoRepo = avisoRepo;
+            _infoRepo = infoRepo;
+            _usuarioRepo = usuarioRepo;
+            _imagenRepo = imagenRepo;
+            _categoriaRepo = categoriaRepo;
         }
 
-        public IActionResult Index()
+        // GET: /
+        public async Task<IActionResult> Index()
         {
-            _logger.LogInformation("Entrando al método Index del HomeController");
+            ViewBag.Avisos = await _avisoRepo.ObtenerVigentesAsync();
+            ViewBag.Informacion = await _infoRepo.ObtenerPrimeraAsync();
             return View();
         }
 
-        public IActionResult Privacy()
+        // GET: /Home/QuienesSomos
+        public async Task<IActionResult> QuienesSomos()
         {
-
-            //return View();
-            throw new Exception("Error probado desde Privacy()");
+            ViewData["ActivePage"] = "Quienes";
+            ViewBag.Informacion = await _infoRepo.ObtenerPrimeraAsync();
+            return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        // GET: /Home/Contacto
+        public async Task<IActionResult> Contacto()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            ViewData["ActivePage"] = "Contacto";
+            ViewBag.Informacion = await _infoRepo.ObtenerPrimeraAsync();
+            return View();
         }
-        // ============================================================
-        //            MÉTODO MANEJO DE ERRORES
-        // ============================================================
-        [HttpGet]
-        public IActionResult ErrorHandler(string? messagesJson)
+
+        // GET: /Home/Dashboard  [Autorizado]
+        [Authorize]
+        public async Task<IActionResult> Dashboard()
         {
-            if (string.IsNullOrWhiteSpace(messagesJson))
-            {
-                ViewBag.ErrorMessages = new ErrorMiddlewareViewModel
-                {
-                    IdEvent = "SIN-DATO",
-                    ListMessages = new List<string> { "No se recibió información de error." },
-                    Path = "N/A"
-                };
+            var avisos = await _avisoRepo.ObtenerTodosAsync();
+            var imagenes = await _imagenRepo.ObtenerTodosAsync();
+            var cats = await _categoriaRepo.ObtenerTodosAsync();
+            var usuarios = await _usuarioRepo.ObtenerConRolesYEstadosAsync();
 
-                return View("ErrorHandler");
-            }
+            ViewBag.TotalAvisos = avisos.Count();
+            ViewBag.TotalImagenes = imagenes.Count();
+            ViewBag.TotalCategorias = cats.Count();
+            ViewBag.TotalUsuarios = usuarios.Count();
+            ViewBag.AvisosRecientes = avisos.OrderByDescending(a => a.FechaPublicacion).Take(5);
+            ViewBag.Usuarios = usuarios.Take(5);
 
-            ErrorMiddlewareViewModel? errorObject = null;
-
-            try
-            {
-                errorObject = JsonSerializer.Deserialize<ErrorMiddlewareViewModel>(
-                    messagesJson,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error al deserializar mensaje del middleware: {ex.Message}");
-
-                errorObject = new ErrorMiddlewareViewModel
-                {
-                    IdEvent = "JSON-INVALIDO",
-                    ListMessages = new List<string>
-                    {
-                        "El mensaje recibido no tiene un formato válido."
-                    }
-                };
-            }
-
-            ViewBag.ErrorMessages = errorObject;
-            return View("ErrorHandler");
+            return View();
         }
     }
 }

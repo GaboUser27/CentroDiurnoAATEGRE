@@ -1,0 +1,91 @@
+﻿@{
+    ViewData["Title"] = "Gestión de Avisos";
+}
+
+<div class="panel-header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-megaphone me-2"></i>Gestión de Avisos</h1>
+                <p class="mb-0">Crea y administra los comunicados que aparecen en la página principal.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-controller="Home" asp-action="Dashboard" class="btn-secundario"
+                   style="border-color:rgba(255,255,255,0.5);color:white;">
+                    <i class="bi bi-arrow-left"></i>Panel
+                </a>
+                <a asp-action="Crear" class="btn-primario" style="background:white;color:var(--azul);">
+                    <i class="bi bi-plus-circle-fill"></i>Nuevo Aviso
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    @if (TempData["Exito"] != null)
+    {
+        <div class="alert alert-success d-flex align-items-center gap-2 rounded-3 mb-4">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Exito"]
+        </div>
+    }
+
+    <div class="bg-white rounded-3 shadow-sm p-4">
+        <div class="table-responsive">
+            <table class="tabla-admin">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Título</th>
+                        <th>Publicación</th>
+                        <th>Expiración</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null)
+                    {
+                        var i = 1;
+                        foreach (var aviso in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">@(i++)</td>
+                                <td class="fw-semibold">@aviso.Titulo</td>
+                                <td>@aviso.FechaPublicacion.ToString("dd/MM/yyyy")</td>
+                                <td>@(aviso.FechaExpiracion.HasValue ? aviso.FechaExpiracion.Value.ToString("dd/MM/yyyy") : "—")</td>
+                                <td>
+                                    @if (aviso.Activo)
+                                    {
+                                        <span class="badge-vigente">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-expirado">Inactivo</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a asp-action="Editar" asp-route-id="@aviso.IdAviso"
+                                           class="btn btn-sm btn-outline-primary rounded-2">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Eliminar" asp-route-id="@aviso.IdAviso"
+                                           class="btn btn-sm btn-outline-danger rounded-2"
+                                           onclick="return confirm('¿Eliminar este aviso?')">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center py-5 text-muted">No hay avisos registrados.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
