@@ -1,3 +1,4 @@
+using AutoMapper;
 using CentroDiurnoAATEGRE.Application.DTOs;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
@@ -10,20 +11,24 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
     public class InformacionInstitucionalController : Controller
     {
         private readonly IInformacionInstitucionalRepository _infoRepo;
+        private readonly IMapper _mapper;
 
-        public InformacionInstitucionalController(IInformacionInstitucionalRepository infoRepo)
+        public InformacionInstitucionalController(
+            IInformacionInstitucionalRepository infoRepo,
+            IMapper mapper)
         {
             _infoRepo = infoRepo;
+            _mapper = mapper;
         }
 
         // GET: /InformacionInstitucional
         public async Task<IActionResult> Index()
         {
             var info = await _infoRepo.ObtenerPrimeraAsync();
-            if (info == null)
-                return RedirectToAction(nameof(Crear));
+            if (info == null) return RedirectToAction(nameof(Crear));
 
-            return View(info);
+            var dto = _mapper.Map<InformacionInstitucionalDTO>(info);
+            return View(dto);
         }
 
         // GET: /InformacionInstitucional/Crear
@@ -40,18 +45,9 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             ViewData["Title"] = "Crear Información Institucional";
             if (!ModelState.IsValid) return View("Formulario", dto);
 
-            var info = new InformacionInstitucional
-            {
-                Titulo    = dto.Titulo,
-                Contenido = dto.Contenido,
-                Telefono  = dto.Telefono,
-                Correo    = dto.Correo,
-                Direccion = dto.Direccion,
-                Facebook  = dto.Facebook,
-                Instagram = dto.Instagram
-            };
-
+            var info = _mapper.Map<InformacionInstitucional>(dto);
             await _infoRepo.AgregarAsync(info);
+
             TempData["Exito"] = "Información institucional guardada.";
             return RedirectToAction(nameof(Index));
         }
@@ -63,17 +59,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             var info = await _infoRepo.ObtenerPorIdAsync(id);
             if (info == null) return NotFound();
 
-            var dto = new InformacionInstitucionalDTO
-            {
-                IdInformacion = info.IdInformacion,
-                Titulo        = info.Titulo,
-                Contenido     = info.Contenido,
-                Telefono      = info.Telefono,
-                Correo        = info.Correo,
-                Direccion     = info.Direccion,
-                Facebook      = info.Facebook,
-                Instagram     = info.Instagram
-            };
+            var dto = _mapper.Map<InformacionInstitucionalDTO>(info);
             return View("Formulario", dto);
         }
 
@@ -87,15 +73,9 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             var info = await _infoRepo.ObtenerPorIdAsync(id);
             if (info == null) return NotFound();
 
-            info.Titulo    = dto.Titulo;
-            info.Contenido = dto.Contenido;
-            info.Telefono  = dto.Telefono;
-            info.Correo    = dto.Correo;
-            info.Direccion = dto.Direccion;
-            info.Facebook  = dto.Facebook;
-            info.Instagram = dto.Instagram;
-
+            _mapper.Map(dto, info);
             await _infoRepo.ActualizarAsync(info);
+
             TempData["Exito"] = "Información actualizada correctamente.";
             return RedirectToAction(nameof(Index));
         }

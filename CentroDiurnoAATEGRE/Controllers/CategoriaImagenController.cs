@@ -1,3 +1,4 @@
+using AutoMapper;
 using CentroDiurnoAATEGRE.Application.DTOs;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
@@ -10,17 +11,20 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
     public class CategoriaImagenController : Controller
     {
         private readonly ICategoriaImagenRepository _categoriaRepo;
+        private readonly IMapper _mapper;
 
-        public CategoriaImagenController(ICategoriaImagenRepository categoriaRepo)
+        public CategoriaImagenController(ICategoriaImagenRepository categoriaRepo, IMapper mapper)
         {
             _categoriaRepo = categoriaRepo;
+            _mapper = mapper;
         }
 
         // GET: /CategoriaImagen
         public async Task<IActionResult> Index()
         {
             var categorias = await _categoriaRepo.ObtenerConImagenesAsync();
-            return View(categorias);
+            var dtos = _mapper.Map<IEnumerable<CategoriaImagenDTO>>(categorias);
+            return View(dtos);
         }
 
         // GET: /CategoriaImagen/Crear
@@ -37,14 +41,10 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             ViewData["Title"] = "Nueva Categoría";
             if (!ModelState.IsValid) return View("Formulario", dto);
 
-            var categoria = new CategoriaImagen
-            {
-                Nombre      = dto.Nombre,
-                Descripcion = dto.Descripcion
-            };
-
+            var categoria = _mapper.Map<CategoriaImagen>(dto);
             await _categoriaRepo.AgregarAsync(categoria);
-            TempData["Exito"] = $"Categoría «{dto.Nombre}» creada. Ahora puedes agregar imágenes.";
+
+            TempData["Exito"] = $"Categoría «{dto.Nombre}» creada.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -55,12 +55,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             var cat = await _categoriaRepo.ObtenerPorIdAsync(id);
             if (cat == null) return NotFound();
 
-            var dto = new CategoriaImagenDTO
-            {
-                IdCategoriaImagen = cat.IdCategoriaImagen,
-                Nombre            = cat.Nombre,
-                Descripcion       = cat.Descripcion
-            };
+            var dto = _mapper.Map<CategoriaImagenDTO>(cat);
             return View("Formulario", dto);
         }
 
@@ -74,10 +69,9 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             var cat = await _categoriaRepo.ObtenerPorIdAsync(id);
             if (cat == null) return NotFound();
 
-            cat.Nombre      = dto.Nombre;
-            cat.Descripcion = dto.Descripcion;
-
+            _mapper.Map(dto, cat);
             await _categoriaRepo.ActualizarAsync(cat);
+
             TempData["Exito"] = "Categoría actualizada correctamente.";
             return RedirectToAction(nameof(Index));
         }
@@ -85,14 +79,13 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         // GET: /CategoriaImagen/Eliminar/5
         public async Task<IActionResult> Eliminar(int id)
         {
-            var cat = await _categoriaRepo.ObtenerConImagenesAsync();
-            var categoria = cat.FirstOrDefault(c => c.IdCategoriaImagen == id);
-
+            var cats = await _categoriaRepo.ObtenerConImagenesAsync();
+            var categoria = cats.FirstOrDefault(c => c.IdCategoriaImagen == id);
             if (categoria == null) return NotFound();
 
             if (categoria.Imagenes.Any())
             {
-                TempData["Error"] = $"No puedes eliminar «{categoria.Nombre}» porque tiene {categoria.Imagenes.Count} imagen(es) asociada(s). Elimina las imágenes primero.";
+                TempData["Error"] = $"No puedes eliminar «{categoria.Nombre}» porque tiene {categoria.Imagenes.Count} imagen(es). Elimínalas primero.";
                 return RedirectToAction(nameof(Index));
             }
 

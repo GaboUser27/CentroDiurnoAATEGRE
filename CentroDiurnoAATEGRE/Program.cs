@@ -5,21 +5,25 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── MVC ────────────────────────────────────────────────────────────────
+// MVC
 builder.Services.AddControllersWithViews();
 
-// ── Base de datos ───────────────────────────────────────────────────────
+// Base de datos
 builder.Services.AddDbContext<AategreeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// ── Repositorios (Dependency Injection) ────────────────────────────────
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(CentroDiurnoAATEGRE.Application.Profiles.MappingProfile));
+
+// Repositorios
 builder.Services.AddScoped<IAvisoRepository, AvisoRepository>();
 builder.Services.AddScoped<ICategoriaImagenRepository, CategoriaImagenRepository>();
 builder.Services.AddScoped<IImagenRepository, ImagenRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IInformacionInstitucionalRepository, InformacionInstitucionalRepository>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-// ── Autenticación con Cookies ───────────────────────────────────────────
+// Autenticación con cookies
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options =>
     {
@@ -33,7 +37,7 @@ builder.Services.AddAuthentication("CookieAuth")
 
 builder.Services.AddAuthorization();
 
-// ── Session (para mensajes temporales) ─────────────────────────────────
+// Sesión
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -43,7 +47,6 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
-// ── Pipeline ────────────────────────────────────────────────────────────
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -53,7 +56,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
@@ -62,7 +64,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// ── Crear directorios para uploads ──────────────────────────────────────
+// Crear carpeta uploads si no existe
 var uploadsPath = Path.Combine(app.Environment.WebRootPath, "uploads");
 if (!Directory.Exists(uploadsPath))
     Directory.CreateDirectory(uploadsPath);

@@ -1,4 +1,5 @@
-﻿using CentroDiurnoAATEGRE.Application.DTOs;
+﻿using AutoMapper;
+using CentroDiurnoAATEGRE.Application.DTOs;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -10,17 +11,20 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
     public class AvisoController : Controller
     {
         private readonly IAvisoRepository _avisoRepo;
+        private readonly IMapper _mapper;
 
-        public AvisoController(IAvisoRepository avisoRepo)
+        public AvisoController(IAvisoRepository avisoRepo, IMapper mapper)
         {
             _avisoRepo = avisoRepo;
+            _mapper = mapper;
         }
 
         // GET: /Aviso
         public async Task<IActionResult> Index()
         {
             var avisos = await _avisoRepo.ObtenerTodosAsync();
-            return View(avisos.OrderByDescending(a => a.FechaPublicacion));
+            var dtos = _mapper.Map<IEnumerable<AvisoDTO>>(avisos.OrderByDescending(a => a.FechaPublicacion));
+            return View(dtos);
         }
 
         // GET: /Aviso/Crear
@@ -42,16 +46,9 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             ViewData["Title"] = "Nuevo Aviso";
             if (!ModelState.IsValid) return View("Formulario", dto);
 
-            var aviso = new Aviso
-            {
-                Titulo = dto.Titulo,
-                Contenido = dto.Contenido,
-                FechaPublicacion = dto.FechaPublicacion,
-                FechaExpiracion = dto.FechaExpiracion,
-                Activo = dto.Activo
-            };
-
+            var aviso = _mapper.Map<Aviso>(dto);
             await _avisoRepo.AgregarAsync(aviso);
+
             TempData["Exito"] = "Aviso creado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
@@ -63,16 +60,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             var aviso = await _avisoRepo.ObtenerPorIdAsync(id);
             if (aviso == null) return NotFound();
 
-            var dto = new AvisoDTO
-            {
-                IdAviso = aviso.IdAviso,
-                Titulo = aviso.Titulo,
-                Contenido = aviso.Contenido,
-                FechaPublicacion = aviso.FechaPublicacion,
-                FechaExpiracion = aviso.FechaExpiracion,
-                Activo = aviso.Activo
-            };
-
+            var dto = _mapper.Map<AvisoDTO>(aviso);
             return View("Formulario", dto);
         }
 
@@ -86,13 +74,9 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             var aviso = await _avisoRepo.ObtenerPorIdAsync(id);
             if (aviso == null) return NotFound();
 
-            aviso.Titulo = dto.Titulo;
-            aviso.Contenido = dto.Contenido;
-            aviso.FechaPublicacion = dto.FechaPublicacion;
-            aviso.FechaExpiracion = dto.FechaExpiracion;
-            aviso.Activo = dto.Activo;
-
+            _mapper.Map(dto, aviso);
             await _avisoRepo.ActualizarAsync(aviso);
+
             TempData["Exito"] = "Aviso actualizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
