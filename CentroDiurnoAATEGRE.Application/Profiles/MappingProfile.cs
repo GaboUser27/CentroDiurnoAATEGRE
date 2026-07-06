@@ -18,15 +18,17 @@ namespace CentroDiurnoAATEGRE.Application.Profiles
             CreateMap<CategoriaImagenDTO, CategoriaImagen>()
                 .ForMember(dest => dest.Imagenes, opt => opt.Ignore());
 
-            // ── Imagen ─────────────────────────────────────────────────
+            // ── Imagen ─────────────────────────────────────────────────────────
             CreateMap<Imagen, ImagenDTO>()
                 .ForMember(dest => dest.NombreCategoria,
                            opt => opt.MapFrom(src => src.CategoriaImagen != null
-                               ? src.CategoriaImagen.Nombre : null));
+                               ? src.CategoriaImagen.Nombre : null))
+                .ForMember(dest => dest.ImagenBytes,
+                           opt => opt.MapFrom(src => src.ImagenBytes));
 
             CreateMap<ImagenDTO, Imagen>()
                 .ForMember(dest => dest.CategoriaImagen, opt => opt.Ignore())
-                .ForMember(dest => dest.RutaArchivo, opt => opt.Ignore());
+                .ForMember(dest => dest.ImagenBytes, opt => opt.Ignore());
 
             // ── Usuario ────────────────────────────────────────────────
             CreateMap<Usuario, UsuarioDTO>()

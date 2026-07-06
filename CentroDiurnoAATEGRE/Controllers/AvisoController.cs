@@ -1,90 +1,73 @@
 ﻿using AutoMapper;
 using CentroDiurnoAATEGRE.Application.DTOs;
+using CentroDiurnoAATEGRE.Application.Services.Interfaces;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CentroDiurnoAATEGRE.Web.Controllers
 {
     [Authorize]
     public class AvisoController : Controller
     {
-        private readonly IAvisoRepository _avisoRepo;
-        private readonly IMapper _mapper;
+        private readonly IAvisoService _avisoService;
 
-        public AvisoController(IAvisoRepository avisoRepo, IMapper mapper)
+        public AvisoController(IAvisoService avisoService)
         {
-            _avisoRepo = avisoRepo;
-            _mapper = mapper;
+            _avisoService = avisoService;
         }
 
-        // GET: /Aviso
         public async Task<IActionResult> Index()
         {
-            var avisos = await _avisoRepo.ObtenerTodosAsync();
-            var dtos = _mapper.Map<IEnumerable<AvisoDTO>>(avisos.OrderByDescending(a => a.FechaPublicacion));
+            var dtos = await _avisoService.ObtenerTodosAsync();
             return View(dtos);
         }
 
-        // GET: /Aviso/Crear
         public IActionResult Crear()
         {
             ViewData["Title"] = "Nuevo Aviso";
-            var dto = new AvisoDTO
+            return View("Formulario", new AvisoDTO
             {
                 FechaPublicacion = DateTime.Now,
                 Activo = true
-            };
-            return View("Formulario", dto);
+            });
         }
 
-        // POST: /Aviso/Crear
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(AvisoDTO dto)
         {
             ViewData["Title"] = "Nuevo Aviso";
             if (!ModelState.IsValid) return View("Formulario", dto);
 
-            var aviso = _mapper.Map<Aviso>(dto);
-            await _avisoRepo.AgregarAsync(aviso);
-
+            await _avisoService.CrearAsync(dto);
             TempData["Exito"] = "Aviso creado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Aviso/Editar/5
         public async Task<IActionResult> Editar(int id)
         {
             ViewData["Title"] = "Editar Aviso";
-            var aviso = await _avisoRepo.ObtenerPorIdAsync(id);
-            if (aviso == null) return NotFound();
-
-            var dto = _mapper.Map<AvisoDTO>(aviso);
+            var dto = await _avisoService.ObtenerPorIdAsync(id);
+            if (dto == null) return NotFound();
             return View("Formulario", dto);
         }
 
-        // POST: /Aviso/Editar/5
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(int id, AvisoDTO dto)
         {
             ViewData["Title"] = "Editar Aviso";
             if (!ModelState.IsValid) return View("Formulario", dto);
 
-            var aviso = await _avisoRepo.ObtenerPorIdAsync(id);
-            if (aviso == null) return NotFound();
-
-            _mapper.Map(dto, aviso);
-            await _avisoRepo.ActualizarAsync(aviso);
-
+            await _avisoService.EditarAsync(id, dto);
             TempData["Exito"] = "Aviso actualizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: /Aviso/Eliminar/5
         public async Task<IActionResult> Eliminar(int id)
         {
-            await _avisoRepo.EliminarAsync(id);
+            await _avisoService.EliminarAsync(id);
             TempData["Exito"] = "Aviso eliminado.";
             return RedirectToAction(nameof(Index));
         }

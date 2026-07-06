@@ -1,6 +1,14 @@
 ﻿@{
     ViewData["Title"] = "Inicio";
     ViewData["ActivePage"] = "Index";
+    var info = ViewBag.Informacion;
+    var avisos = ViewBag.Avisos as IEnumerable<CentroDiurnoAATEGRE.Infraestructure.Models.Aviso>;
+    var imagenes = ViewBag.Imagenes as IEnumerable<CentroDiurnoAATEGRE.Infraestructure.Models.Imagen>;
+    var tituloCentro = info?.Titulo ?? "AATEGRE Centro Diurno";
+    var descripcionCentro = info?.Contenido ?? "Configure la historia y descripción del centro desde el panel administrativo para mostrarla aquí.";
+    var direccionCentro = info?.Direccion ?? "Dirección pendiente de configurar";
+    var telefonoCentro = info?.Telefono ?? "Teléfono pendiente";
+    var correoCentro = info?.Correo ?? "Correo pendiente";
 }
 
 <section class="hero">
@@ -15,7 +23,7 @@
             <div class="col-lg-7 hero-contenido">
                 <div class="hero-eyebrow fade-in-up">
                     <i class="bi bi-heart-pulse-fill"></i>
-                    Centro Diurno · Grecia, Alajuela
+                    @tituloCentro
                 </div>
                 <h1 class="hero-titulo fade-in-up delay-1">
                     Un espacio de
@@ -23,8 +31,7 @@
                     para quienes más queremos
                 </h1>
                 <p class="hero-descripcion fade-in-up delay-2">
-                    En AATEGRE brindamos atención integral a nuestros adultos mayores, combinando
-                    cuidado profesional con actividades que nutren el cuerpo, la mente y el espíritu.
+                    @descripcionCentro
                 </p>
                 <div class="hero-botones fade-in-up delay-3">
                     <a asp-controller="Home" asp-action="QuienesSomos" class="btn-primario">
@@ -82,9 +89,9 @@
             <p class="seccion-subtitulo mt-3">Mantente al tanto de las últimas noticias del Centro Diurno.</p>
         </div>
         <div class="row g-4">
-            @if (ViewBag.Avisos != null && ((IEnumerable<dynamic>)ViewBag.Avisos).Any())
+            @if (avisos?.Any() == true)
             {
-                foreach (var aviso in ViewBag.Avisos)
+                foreach (var aviso in avisos)
                 {
                     <div class="col-md-6 col-lg-4">
                         <div class="aviso-card">
@@ -96,7 +103,7 @@
                                 Publicado: @aviso.FechaPublicacion.ToString("dd/MM/yyyy")
                                 @if (aviso.FechaExpiracion != null)
                                 {
-                                    <span class="ms-2"><i class="bi bi-clock"></i> Vence: @aviso.FechaExpiracion.ToString("dd/MM/yyyy")</span>
+                                    <span class="ms-2"><i class="bi bi-clock"></i> Vence: @aviso.FechaExpiracion.Value.ToString("dd/MM/yyyy")</span>
                                 }
                             </div>
                         </div>
@@ -105,28 +112,11 @@
             }
             else
             {
-                <div class="col-md-6 col-lg-4">
-                    <div class="aviso-card">
-                        <div class="aviso-badge"><i class="bi bi-bell-fill"></i> Aviso</div>
-                        <h4 class="aviso-titulo">Actividades de Semana Santa</h4>
-                        <p class="aviso-contenido">Durante Semana Santa el Centro permanecerá cerrado del Jueves 17 al Domingo 20 de abril.</p>
-                        <div class="aviso-fecha"><i class="bi bi-calendar3"></i> Publicado: 10/04/2025</div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="aviso-card urgente">
-                        <div class="aviso-badge lila-badge"><i class="bi bi-star-fill"></i> Especial</div>
-                        <h4 class="aviso-titulo">Jornada de Salud Gratuita</h4>
-                        <p class="aviso-contenido">El próximo viernes realizaremos una jornada de salud con control de presión y glucosa.</p>
-                        <div class="aviso-fecha"><i class="bi bi-calendar3"></i> Publicado: 12/04/2025</div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="aviso-card">
-                        <div class="aviso-badge"><i class="bi bi-bell-fill"></i> Aviso</div>
-                        <h4 class="aviso-titulo">Horario Extendido en Julio</h4>
-                        <p class="aviso-contenido">Durante julio ampliaremos nuestro horario hasta las 5:00 p.m.</p>
-                        <div class="aviso-fecha"><i class="bi bi-calendar3"></i> Publicado: 01/06/2025</div>
+                <div class="col-12">
+                    <div class="estado-vacio">
+                        <i class="bi bi-megaphone"></i>
+                        <h4>No hay avisos publicados</h4>
+                        <p>Cuando el equipo administrativo publique avisos vigentes, aparecerán en esta sección.</p>
                     </div>
                 </div>
             }
@@ -139,7 +129,9 @@
         <div class="row align-items-center g-5">
             <div class="col-lg-5">
                 <div class="quienes-imagen-wrap">
-                    <div class="quienes-imagen-bg"><span>🤝</span></div>
+                    <img src="./images/Centro-Diurno-Antes.jpg"
+                         alt="Cuidadora y anciana sonriendo"
+                         class="quienes-imagen-bg img-fluid rounded shadow">
                     <div class="quienes-badge-flotante">
                         <div class="quienes-badge-icono">❤️</div>
                         <div class="quienes-badge-texto">
@@ -156,8 +148,7 @@
                 <h2 class="seccion-titulo">¿Quiénes Somos?</h2>
                 <div class="linea-acento izquierda mb-4"></div>
                 <p style="color:var(--texto-suave); font-size:1.05rem; line-height:1.8;">
-                    AATEGRE Centro Diurno es un espacio dedicado al bienestar integral de los adultos mayores de
-                    la zona de Grecia, Alajuela.
+                    @descripcionCentro
                 </p>
                 <ul class="valores-lista mt-4">
                     <li>
@@ -225,7 +216,7 @@
             </div>
             <div class="col-sm-6 col-lg-4">
                 <div class="servicio-card">
-                    <div class="servicio-icono-wrap servicio-icono-teal"><i class="bi bi-brain"></i></div>
+                    <div class="servicio-icono-wrap servicio-icono-teal"><i class="bi bi-lightbulb"></i></div>
                     <h4 class="servicio-titulo">Estimulación Cognitiva</h4>
                     <p class="servicio-desc">Talleres de memoria, lectura y actividades que mantienen la mente activa y ágil.</p>
                 </div>
@@ -255,28 +246,44 @@
                 </a>
             </div>
         </div>
-        <div class="galeria-grid">
-            <div class="galeria-item grande">
-                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Actividades deportivas</span></div>
-                <div class="galeria-overlay">🏃 Terapia física y ejercicio</div>
+        @{
+            var imgs = ViewBag.Imagenes as List<CentroDiurnoAATEGRE.Infraestructure.Models.Imagen>;
+        }
+
+        @if (imagenes != null && imagenes.Any())
+        {
+            <div class="galeria-grid">
+                @{
+                    var indiceImagen = 0;
+                }
+                @foreach (var img in imagenes)
+                {
+                    var base64 = img.ImagenBytes != null
+                    ? $"data:image/jpeg;base64,{Convert.ToBase64String(img.ImagenBytes)}"
+                    : null;
+
+                    <div class="galeria-item @(indiceImagen == 0 ? "grande" : "")">
+                        @if (base64 != null)
+                        {
+                            <img src="@base64" alt="@img.Titulo" class="galeria-img"
+                                 style="width:100%;height:100%;object-fit:cover;" />
+                        }
+                        <div class="galeria-overlay">
+                            @(string.IsNullOrWhiteSpace(img.Descripcion) ? img.Titulo : img.Descripcion)
+                        </div>
+                    </div>
+                    indiceImagen++;
+                }
             </div>
-            <div class="galeria-item">
-                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Celebración navideña</span></div>
-                <div class="galeria-overlay">🎄 Navidad 2024</div>
+        }
+        else
+        {
+            <div class="estado-vacio">
+                <i class="bi bi-images"></i>
+                <h4>Galería pendiente</h4>
+                <p>Las imágenes cargadas desde el panel administrativo aparecerán aquí automáticamente.</p>
             </div>
-            <div class="galeria-item">
-                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Día del adulto mayor</span></div>
-                <div class="galeria-overlay">🎉 Celebración especial</div>
-            </div>
-            <div class="galeria-item">
-                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Taller de manualidades</span></div>
-                <div class="galeria-overlay">🎨 Creatividad y arte</div>
-            </div>
-            <div class="galeria-item">
-                <div class="galeria-placeholder"><i class="bi bi-image"></i><span>Música y baile</span></div>
-                <div class="galeria-overlay">🎵 Momentos de alegría</div>
-            </div>
-        </div>
+        }
     </div>
 </section>
 
@@ -292,7 +299,7 @@
                     <div class="contacto-icono ci-azul"><i class="bi bi-geo-alt-fill"></i></div>
                     <div>
                         <p class="contacto-info-titulo">Dirección</p>
-                        <p class="contacto-info-dato">Grecia, Alajuela, Costa Rica</p>
+                        <p class="contacto-info-dato">@direccionCentro</p>
                     </div>
                 </div>
             </div>
@@ -301,7 +308,7 @@
                     <div class="contacto-icono ci-lila"><i class="bi bi-telephone-fill"></i></div>
                     <div>
                         <p class="contacto-info-titulo">Teléfono</p>
-                        <p class="contacto-info-dato">+506 2494-XXXX</p>
+                        <p class="contacto-info-dato">@telefonoCentro</p>
                     </div>
                 </div>
             </div>
@@ -310,7 +317,7 @@
                     <div class="contacto-icono ci-verde"><i class="bi bi-envelope-fill"></i></div>
                     <div>
                         <p class="contacto-info-titulo">Correo electrónico</p>
-                        <p class="contacto-info-dato">info@aategre.cr</p>
+                        <p class="contacto-info-dato">@correoCentro</p>
                     </div>
                 </div>
             </div>
@@ -319,7 +326,7 @@
                     <div class="contacto-icono ci-naranja"><i class="bi bi-clock-fill"></i></div>
                     <div>
                         <p class="contacto-info-titulo">Horario</p>
-                        <p class="contacto-info-dato">Lun – Vie · 7:00 a.m. – 4:00 p.m.</p>
+                        <p class="contacto-info-dato">Lun – Vie · 8 a.m. – 2 p.m.</p>
                     </div>
                 </div>
             </div>

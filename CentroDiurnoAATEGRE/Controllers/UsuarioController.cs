@@ -1,32 +1,31 @@
 using AutoMapper;
 using CentroDiurnoAATEGRE.Application.DTOs;
+using CentroDiurnoAATEGRE.Application.Services.Interfaces;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace CentroDiurnoAATEGRE.Web.Controllers
 {
     public class UsuarioController : Controller
     {
-        private readonly IUsuarioRepository _usuarioRepo;
+        private readonly IUsuarioService _usuarioService;
         private readonly IGenericRepository<Rol> _rolRepo;
         private readonly IGenericRepository<EstadoUsuario> _estadoRepo;
-        private readonly IMapper _mapper;
 
         public UsuarioController(
-            IUsuarioRepository usuarioRepo,
+            IUsuarioService usuarioService,
             IGenericRepository<Rol> rolRepo,
-            IGenericRepository<EstadoUsuario> estadoRepo,
-            IMapper mapper)
+            IGenericRepository<EstadoUsuario> estadoRepo)
         {
-            _usuarioRepo = usuarioRepo;
+            _usuarioService = usuarioService;
             _rolRepo = rolRepo;
             _estadoRepo = estadoRepo;
-            _mapper = mapper;
         }
 
         // ── LOGIN ──────────────────────────────────────────────────────
@@ -44,23 +43,11 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         {
             if (!ModelState.IsValid) return View(dto);
 
-            var usuario = await _usuarioRepo.ObtenerPorCorreoAsync(dto.Correo);
+            var usuario = await _usuarioService.ValidarLoginAsync(dto.Correo, dto.Contrasena);
 
             if (usuario == null)
             {
-                ViewBag.Error = "El correo electrónico no está registrado.";
-                return View(dto);
-            }
-
-            if (usuario.EstadoUsuario?.Nombre != "Activo")
-            {
-                ViewBag.Error = "Su cuenta está inactiva. Contacte al administrador.";
-                return View(dto);
-            }
-
-            if (usuario.Contrasena != dto.Contrasena)
-            {
-                ViewBag.Error = "Contraseña incorrecta.";
+                ViewBag.Error = "Correo o contraseña incorrectos, o cuenta inactiva.";
                 return View(dto);
             }
 
@@ -69,7 +56,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
                 new Claim(ClaimTypes.Name,  usuario.Nombre),
                 new Claim(ClaimTypes.Email, usuario.Correo),
-                new Claim(ClaimTypes.Role,  usuario.Rol?.Nombre ?? "Colaborador")
+                new Claim(ClaimTypes.Role,  usuario.NombreRol ?? "Colaborador")
             };
 
             var identity = new ClaimsIdentity(claims, "CookieAuth");
@@ -91,8 +78,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            var usuarios = await _usuarioRepo.ObtenerConRolesYEstadosAsync();
-            var dtos = _mapper.Map<IEnumerable<UsuarioDTO>>(usuarios);
+            var dtos = await _usuarioService.ObtenerTodosAsync();
             return View(dtos);
         }
 
@@ -108,9 +94,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         {
             if (!ModelState.IsValid) { await CargarSelectsAsync(); return View("Formulario", dto); }
 
-            var usuario = _mapper.Map<Usuario>(dto);
-            await _usuarioRepo.AgregarAsync(usuario);
-
+            await _usuarioService.CrearAsync(dto);
             TempData["Exito"] = "Usuario creado exitosamente.";
             return RedirectToAction(nameof(Index));
         }
@@ -118,11 +102,10 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         [Authorize]
         public async Task<IActionResult> Editar(int id)
         {
-            var usuario = await _usuarioRepo.ObtenerPorIdAsync(id);
-            if (usuario == null) return NotFound();
+            var dto = await _usuarioService.ObtenerPorIdAsync(id);
+            if (dto == null) return NotFound();
 
             await CargarSelectsAsync();
-            var dto = _mapper.Map<UsuarioDTO>(usuario);
             return View("Formulario", dto);
         }
 
@@ -132,20 +115,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             ModelState.Remove(nameof(dto.Contrasena));
             if (!ModelState.IsValid) { await CargarSelectsAsync(); return View("Formulario", dto); }
 
-            var usuario = await _usuarioRepo.ObtenerPorIdAsync(id);
-            if (usuario == null) return NotFound();
-
-            // Guardar contraseña actual antes del mapeo
-            var contrasenaActual = usuario.Contrasena;
-
-            _mapper.Map(dto, usuario);
-
-            // Restaurar o actualizar contraseña
-            usuario.Contrasena = !string.IsNullOrWhiteSpace(dto.Contrasena)
-                ? dto.Contrasena
-                : contrasenaActual;
-
-            await _usuarioRepo.ActualizarAsync(usuario);
+            await _usuarioService.EditarAsync(id, dto);
             TempData["Exito"] = "Usuario actualizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
@@ -153,13 +123,8 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> CambiarEstado(int id)
         {
-            var usuario = await _usuarioRepo.ObtenerPorIdAsync(id);
-            if (usuario == null) return NotFound();
-
-            int nuevoEstado = usuario.IdEstadoUsuario == 1 ? 2 : 1;
-            await _usuarioRepo.CambiarEstadoAsync(id, nuevoEstado);
-
-            TempData["Exito"] = nuevoEstado == 1 ? "Usuario activado." : "Usuario desactivado.";
+            await _usuarioService.CambiarEstadoAsync(id);
+            TempData["Exito"] = "Estado del usuario actualizado.";
             return RedirectToAction(nameof(Index));
         }
 

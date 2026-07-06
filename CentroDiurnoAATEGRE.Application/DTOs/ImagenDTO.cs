@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CentroDiurnoAATEGRE.Application.DTOs
 {
@@ -29,6 +24,13 @@ namespace CentroDiurnoAATEGRE.Application.DTOs
         public int IdCategoriaImagen { get; set; }
 
         public string? NombreCategoria { get; set; }
-        public string? RutaArchivo { get; set; }
+
+        // Bytes para mostrar en vista como base64
+        public byte[]? ImagenBytes { get; set; }
+
+        // Base64 generado en el controlador para mostrar en <img>
+        public string? ImagenBase64 => ImagenBytes != null
+            ? $"data:image/jpeg;base64,{Convert.ToBase64String(ImagenBytes)}"
+            : null;
     }
 }

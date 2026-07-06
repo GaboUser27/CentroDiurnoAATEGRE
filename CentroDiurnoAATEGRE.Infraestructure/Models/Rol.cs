@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 namespace CentroDiurnoAATEGRE.Infraestructure.Models;
 
-public class Rol
+public partial class Rol
 {
-    [Key]
     public int IdRol { get; set; }
 
-    [Required, MaxLength(50)]
-    public string Nombre { get; set; } = string.Empty;
+    public string Nombre { get; set; } = null!;
 
-    public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
+    public virtual ICollection<Usuario> Usuario { get; set; } = new List<Usuario>();
 }

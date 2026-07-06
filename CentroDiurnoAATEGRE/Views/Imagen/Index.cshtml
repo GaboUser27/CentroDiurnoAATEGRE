@@ -1,4 +1,5 @@
-﻿@{
+@model IEnumerable<CentroDiurnoAATEGRE.Application.DTOs.ImagenDTO>
+@{
     ViewData["Title"] = "Gestión de Galería";
 }
 
@@ -34,7 +35,7 @@
         </div>
     }
 
-    @if (Model != null && ((IEnumerable<dynamic>)Model).Any())
+    @if (Model?.Any() == true)
     {
         <div class="row g-3">
             @foreach (var img in Model)
@@ -42,20 +43,20 @@
                 <div class="col-sm-6 col-md-4 col-lg-3">
                     <div class="bg-white rounded-3 shadow-sm overflow-hidden h-100">
                         <div style="height:180px;background:var(--gris);overflow:hidden;position:relative;">
-                            @if (!string.IsNullOrEmpty(img.RutaArchivo))
+                            @if (img.ImagenBase64 != null)
                             {
-                                <img src="~/uploads/@img.RutaArchivo" alt="@img.Titulo"
+                                <img src="@img.ImagenBase64" alt="@img.Titulo"
                                      style="width:100%;height:100%;object-fit:cover;" />
                             }
                             else
                             {
-                                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;color:var(--texto-suave);">
+                                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;">
                                     <i class="bi bi-image" style="font-size:2.5rem;color:var(--gris-borde);"></i>
-                                    <small>Sin imagen</small>
+                                    <small class="text-muted">Sin imagen</small>
                                 </div>
                             }
                             <span style="position:absolute;top:.5rem;left:.5rem;background:rgba(43,108,184,.85);color:white;padding:.2rem .65rem;border-radius:50px;font-size:.72rem;font-weight:600;">
-                                <i class="bi bi-folder-fill me-1"></i>@img.CategoriaImagen?.Nombre
+                                <i class="bi bi-folder-fill me-1"></i>@img.NombreCategoria
                             </span>
                         </div>
                         <div class="p-3">

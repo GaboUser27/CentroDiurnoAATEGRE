@@ -1,4 +1,8 @@
-﻿using CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations;
+using AutoMapper;
+using CentroDiurnoAATEGRE.Application.Profiles;
+using CentroDiurnoAATEGRE.Application.Services.Implementations;
+using CentroDiurnoAATEGRE.Application.Services.Interfaces;
+using CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
 using CentroDiurnoAATEGRE.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +17,12 @@ builder.Services.AddDbContext<AategreeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // AutoMapper
-builder.Services.AddAutoMapper(typeof(CentroDiurnoAATEGRE.Application.Profiles.MappingProfile));
+builder.Services.AddSingleton<IMapper>(sp =>
+{
+    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+    var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>(), loggerFactory);
+    return config.CreateMapper();
+});
 
 // Repositorios
 builder.Services.AddScoped<IAvisoRepository, AvisoRepository>();
@@ -22,6 +31,12 @@ builder.Services.AddScoped<IImagenRepository, ImagenRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IInformacionInstitucionalRepository, InformacionInstitucionalRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+// Servicios
+builder.Services.AddScoped<IAvisoService, AvisoService>();
+builder.Services.AddScoped<IInformacionInstitucionalService, InformacionInstitucionalService>();
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<IImagenService, ImagenService>();
+builder.Services.AddScoped<ICategoriaImagenService, CategoriaImagenService>();
 
 // Autenticación con cookies
 builder.Services.AddAuthentication("CookieAuth")

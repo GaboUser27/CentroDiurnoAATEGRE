@@ -23,11 +23,11 @@
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <div class="bg-white rounded-3 shadow-sm p-4 p-md-5">
-                @if (esEdicion && !string.IsNullOrEmpty(Model.RutaArchivo))
+                @if (esEdicion && Model.ImagenBase64 != null)
                 {
                     <div class="mb-4 text-center">
                         <p class="form-label">Imagen actual</p>
-                        <img src="~/uploads/@Model.RutaArchivo" alt="Imagen actual"
+                        <img src="@Model.ImagenBase64" alt="Imagen actual"
                              style="max-height:200px;border-radius:12px;box-shadow:var(--sombra);" />
                     </div>
                 }
