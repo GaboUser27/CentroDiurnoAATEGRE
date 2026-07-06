@@ -23,14 +23,7 @@ namespace CentroDiurnoAATEGRE.Application.DTOs
         [Display(Name = "Categoría")]
         public int IdCategoriaImagen { get; set; }
 
-        public string? NombreCategoria { get; set; }
+        public byte[] Imagen { get; set; } = Array.Empty<byte>();
 
-        // Bytes para mostrar en vista como base64
-        public byte[]? ImagenBytes { get; set; }
-
-        // Base64 generado en el controlador para mostrar en <img>
-        public string? ImagenBase64 => ImagenBytes != null
-            ? $"data:image/jpeg;base64,{Convert.ToBase64String(ImagenBytes)}"
-            : null;
     }
 }

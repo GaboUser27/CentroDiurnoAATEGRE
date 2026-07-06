@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CentroDiurnoAATEGRE.Infraestructure.Models;
 
 namespace CentroDiurnoAATEGRE.Application.DTOs
 {
@@ -20,6 +21,6 @@ namespace CentroDiurnoAATEGRE.Application.DTOs
         [Display(Name = "Descripción")]
         public string? Descripcion { get; set; }
 
-        public int TotalImagenes { get; set; }
+        public List<ImagenDTO> Imagen { get; set; } = new();
     }
 }

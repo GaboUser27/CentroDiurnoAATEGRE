@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
-using CentroDiurnoAATEGRE.Infrastructure.Data;
+using CentroDiurnoAATEGRE.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations

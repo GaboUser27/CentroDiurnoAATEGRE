@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CentroDiurnoAATEGRE.Infraestructure.Models;
 
 namespace CentroDiurnoAATEGRE.Application.DTOs
 {
@@ -24,17 +25,14 @@ namespace CentroDiurnoAATEGRE.Application.DTOs
 
         [Display(Name = "Contraseña")]
         [MinLength(6, ErrorMessage = "Mínimo 6 caracteres.")]
-        public string? Contrasena { get; set; }
+        public string? Contrasena { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Seleccione un rol.")]
-        [Display(Name = "Rol")]
         public int IdRol { get; set; }
 
-        [Required]
-        [Display(Name = "Estado")]
         public int IdEstadoUsuario { get; set; }
 
-        public string? NombreRol { get; set; }
-        public string? NombreEstado { get; set; }
+        public EstadoUsuarioDTO IdEstadoUsuarioNavigation { get; set; } = new();
+
+        public RolDTO IdRolNavigation { get; set; } = new();
     }
 }

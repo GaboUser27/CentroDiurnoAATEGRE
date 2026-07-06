@@ -2,9 +2,9 @@ using AutoMapper;
 using CentroDiurnoAATEGRE.Application.Profiles;
 using CentroDiurnoAATEGRE.Application.Services.Implementations;
 using CentroDiurnoAATEGRE.Application.Services.Interfaces;
+using CentroDiurnoAATEGRE.Infraestructure.Data;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
-using CentroDiurnoAATEGRE.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,16 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // Base de datos
-builder.Services.AddDbContext<AategreeDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// AutoMapper
-builder.Services.AddSingleton<IMapper>(sp =>
-{
-    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
-    var config = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>(), loggerFactory);
-    return config.CreateMapper();
-});
+builder.Services.AddDbContext<AATEGREContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")))
 
 // Repositorios
 builder.Services.AddScoped<IAvisoRepository, AvisoRepository>();
@@ -37,6 +29,21 @@ builder.Services.AddScoped<IInformacionInstitucionalService, InformacionInstituc
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IImagenService, ImagenService>();
 builder.Services.AddScoped<ICategoriaImagenService, CategoriaImagenService>();
+
+//Automapper
+builder.Services.AddAutoMapper(config =>
+{
+    // *** Profiles
+    config.AddProfile<AvisoProfile>();
+    config.AddProfile<CategoriaImagenProfile>();
+    config.AddProfile<EstadoUsuarioProfile>();
+    config.AddProfile<HorarioProfile>();
+    config.AddProfile<ImagenProfile>();
+    config.AddProfile<InformacionInstitucionalProfile>();
+    config.AddProfile<RolProfile>();
+    config.AddProfile<UsuarioProfile>();
+
+});
 
 // Autenticación con cookies
 builder.Services.AddAuthentication("CookieAuth")

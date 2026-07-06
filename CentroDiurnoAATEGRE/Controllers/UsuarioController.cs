@@ -39,7 +39,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         }
 
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginDTO dto)
+        public async Task<IActionResult> Login(RolDTO dto)
         {
             if (!ModelState.IsValid) return View(dto);
 
