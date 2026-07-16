@@ -34,7 +34,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             ViewBag.Avisos = await _avisoService.ObtenerVigentesAsync();
             ViewBag.Informacion = await _infoService.ObtenerPrimeraAsync();
             ViewBag.Imagenes = (await _imagenService.ObtenerConCategoriaAsync())
-                .Where(i => i.ImagenBytes != null)
+                .Where(i => i.Imagen1 != null)
                 .OrderByDescending(i => i.FechaImagen)
                 .Take(5)
                 .ToList();

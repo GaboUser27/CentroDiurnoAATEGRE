@@ -43,7 +43,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
         {
             var usuario = await _repo.ObtenerPorCorreoAsync(correo);
             if (usuario == null) return null;
-            if (usuario.EstadoUsuario?.Nombre != "Activo") return null;
+            if (usuario.IdEstadoUsuarioNavigation?.Nombre != "Activo") return null;
             if (usuario.Contrasena != contrasena) return null;
 
             return _mapper.Map<UsuarioDTO>(usuario);

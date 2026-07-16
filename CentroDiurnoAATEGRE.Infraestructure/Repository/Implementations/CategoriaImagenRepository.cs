@@ -13,11 +13,11 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations
 {
     public class CategoriaImagenRepository : GenericRepository<CategoriaImagen>, ICategoriaImagenRepository
     {
-        public CategoriaImagenRepository(AategreeDbContext context) : base(context) { }
+        public CategoriaImagenRepository(AATEGREContext context) : base(context) { }
 
         public async Task<IEnumerable<CategoriaImagen>> ObtenerConImagenesAsync() =>
-            await _context.CategoriasImagen
-                .Include(c => c.Imagenes)
+            await _context.CategoriaImagen
+                .Include(c => c.Imagen)
                 .ToListAsync();
     }
 }

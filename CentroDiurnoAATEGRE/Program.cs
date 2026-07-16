@@ -14,7 +14,7 @@ builder.Services.AddControllersWithViews();
 
 // Base de datos
 builder.Services.AddDbContext<AATEGREContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")))
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Repositorios
 builder.Services.AddScoped<IAvisoRepository, AvisoRepository>();

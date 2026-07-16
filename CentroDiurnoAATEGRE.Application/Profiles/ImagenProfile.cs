@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CentroDiurnoAATEGRE.Application.DTOs;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
 using System;
@@ -15,7 +15,9 @@ namespace CentroDiurnoAATEGRE.Application.Profiles
         {
 
             // Entidad → DTO
-            CreateMap<Imagen, ImagenDTO>();
+            CreateMap<Imagen, ImagenDTO>()
+                .ForMember(d => d.IdCategoriaImagenNavigation,
+                    o => o.MapFrom(s => s.IdCategoriaImagenNavigation));
 
             // DTO → Entidad
             CreateMap<ImagenDTO, Imagen>()

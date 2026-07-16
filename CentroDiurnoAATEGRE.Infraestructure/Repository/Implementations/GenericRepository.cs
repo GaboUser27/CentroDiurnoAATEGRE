@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
-using CentroDiurnoAATEGRE.Infrastructure.Data;
+using CentroDiurnoAATEGRE.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly AategreeDbContext _context;
+        protected readonly AATEGREContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public GenericRepository(AategreeDbContext context)
+        public GenericRepository(AATEGREContext context)
         {
             _context = context;
             _dbSet = context.Set<T>();

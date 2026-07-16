@@ -13,7 +13,7 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations
     public class InformacionInstitucionalRepository
         : GenericRepository<InformacionInstitucional>, IInformacionInstitucionalRepository
     {
-        public InformacionInstitucionalRepository(AategreeDbContext context) : base(context) { }
+        public InformacionInstitucionalRepository(AATEGREContext context) : base(context) { }
 
         public async Task<InformacionInstitucional?> ObtenerPrimeraAsync() =>
             await _context.InformacionInstitucional.FirstOrDefaultAsync();

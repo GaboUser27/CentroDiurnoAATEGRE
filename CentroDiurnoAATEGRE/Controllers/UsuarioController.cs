@@ -39,11 +39,11 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         }
 
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(RolDTO dto)
+        public async Task<IActionResult> Login(UsuarioDTO dto)
         {
             if (!ModelState.IsValid) return View(dto);
 
-            var usuario = await _usuarioService.ValidarLoginAsync(dto.Correo, dto.Contrasena);
+            var usuario = await _usuarioService.ValidarLoginAsync(dto.Correo, dto.Contrasena ?? string.Empty);
 
             if (usuario == null)
             {
@@ -56,7 +56,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
                 new Claim(ClaimTypes.NameIdentifier, usuario.IdUsuario.ToString()),
                 new Claim(ClaimTypes.Name,  usuario.Nombre),
                 new Claim(ClaimTypes.Email, usuario.Correo),
-                new Claim(ClaimTypes.Role,  usuario.NombreRol ?? "Colaborador")
+                new Claim(ClaimTypes.Role,  usuario.IdRolNavigation?.Nombre ?? "Colaborador")
             };
 
             var identity = new ClaimsIdentity(claims, "CookieAuth");

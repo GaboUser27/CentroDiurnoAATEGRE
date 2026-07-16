@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace CentroDiurnoAATEGRE.Application.DTOs
 {
@@ -23,7 +23,12 @@ namespace CentroDiurnoAATEGRE.Application.DTOs
         [Display(Name = "Categoría")]
         public int IdCategoriaImagen { get; set; }
 
-        public byte[] Imagen { get; set; } = Array.Empty<byte>();
+        public byte[]? Imagen1 { get; set; }
 
+        public virtual CategoriaImagenDTO IdCategoriaImagenNavigation { get; set; } = null!;
+
+        public string? ImagenBase64 => Imagen1 != null && Imagen1.Length > 0 
+            ? $"data:image/jpeg;base64,{Convert.ToBase64String(Imagen1)}" 
+            : null;
     }
 }

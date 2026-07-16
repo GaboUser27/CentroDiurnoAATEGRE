@@ -59,7 +59,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
             var cats = await _repo.ObtenerConImagenesAsync();
             var categoria = cats.FirstOrDefault(c => c.IdCategoriaImagen == id);
             if (categoria == null) return false;
-            if (categoria.Imagenes.Any()) return false; // tiene imágenes asociadas
+            if (categoria.Imagen.Any()) return false; // tiene imágenes asociadas
 
             await _repo.EliminarAsync(id);
             return true;

@@ -49,7 +49,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
         public async Task CrearAsync(ImagenDTO dto, byte[]? imagenBytes)
         {
             var imagen = _mapper.Map<Imagen>(dto);
-            imagen.ImagenBytes = imagenBytes;
+            imagen.Imagen1 = imagenBytes;
             await _repo.AgregarAsync(imagen);
         }
 
@@ -58,11 +58,11 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
             var imagen = await _repo.ObtenerPorIdAsync(id)
                 ?? throw new KeyNotFoundException($"Imagen {id} no encontrada.");
 
-            var bytesAnteriores = imagen.ImagenBytes;
+            var bytesAnteriores = imagen.Imagen1;
             _mapper.Map(dto, imagen);
 
             // Solo reemplaza si se subió una nueva imagen
-            imagen.ImagenBytes = imagenBytes ?? bytesAnteriores;
+            imagen.Imagen1 = imagenBytes ?? bytesAnteriores;
 
             await _repo.ActualizarAsync(imagen);
         }

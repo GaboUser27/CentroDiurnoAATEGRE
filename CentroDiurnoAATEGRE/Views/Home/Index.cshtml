@@ -1,9 +1,9 @@
-﻿@{
+@{
     ViewData["Title"] = "Inicio";
     ViewData["ActivePage"] = "Index";
     var info = ViewBag.Informacion;
     var avisos = ViewBag.Avisos as IEnumerable<CentroDiurnoAATEGRE.Infraestructure.Models.Aviso>;
-    var imagenes = ViewBag.Imagenes as IEnumerable<CentroDiurnoAATEGRE.Infraestructure.Models.Imagen>;
+    var imagenes = ViewBag.Imagenes as IEnumerable<CentroDiurnoAATEGRE.Application.DTOs.ImagenDTO>;
     var tituloCentro = info?.Titulo ?? "AATEGRE Centro Diurno";
     var descripcionCentro = info?.Contenido ?? "Configure la historia y descripción del centro desde el panel administrativo para mostrarla aquí.";
     var direccionCentro = info?.Direccion ?? "Dirección pendiente de configurar";
@@ -246,10 +246,6 @@
                 </a>
             </div>
         </div>
-        @{
-            var imgs = ViewBag.Imagenes as List<CentroDiurnoAATEGRE.Infraestructure.Models.Imagen>;
-        }
-
         @if (imagenes != null && imagenes.Any())
         {
             <div class="galeria-grid">
@@ -258,9 +254,7 @@
                 }
                 @foreach (var img in imagenes)
                 {
-                    var base64 = img.ImagenBytes != null
-                    ? $"data:image/jpeg;base64,{Convert.ToBase64String(img.ImagenBytes)}"
-                    : null;
+                    var base64 = img.ImagenBase64;
 
                     <div class="galeria-item @(indiceImagen == 0 ? "grande" : "")">
                         @if (base64 != null)
