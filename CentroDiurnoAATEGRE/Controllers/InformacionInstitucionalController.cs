@@ -54,6 +54,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(int id, InformacionInstitucionalDTO dto)
         {
+            dto.IdInformacion= id;
             ViewData["Title"] = "Editar Información Institucional";
             if (!ModelState.IsValid) return View("Formulario", dto);
 

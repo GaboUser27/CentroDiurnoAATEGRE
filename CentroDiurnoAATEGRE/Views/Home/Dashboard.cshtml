@@ -155,9 +155,9 @@
                                 {
                                     <tr>
                                         <td class="fw-semibold">@u.Nombre</td>
-                                        <td><small>@u.Rol?.Nombre</small></td>
+                                        <td><small>@u.IdRolNavigation?.Nombre</small></td>
                                         <td>
-                                            @if (u.EstadoUsuario?.Nombre == "Activo")
+                                            @if (u.IdEstadoUsuarioNavigation?.Nombre == "Activo")
                                             {
                                                 <span class="badge-activo">Activo</span>
                                             }

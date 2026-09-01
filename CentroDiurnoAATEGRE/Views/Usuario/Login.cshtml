@@ -32,6 +32,12 @@
                                 <span>@ViewBag.Error</span>
                             </div>
                         }
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger rounded-3" role="alert">
+                                <div asp-validation-summary="All"></div>
+                            </div>
+                        }
 
                         <form method="post" asp-action="Login" asp-controller="Usuario" class="form-admin">
                             @Html.AntiForgeryToken()

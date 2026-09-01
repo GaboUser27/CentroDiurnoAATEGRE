@@ -41,6 +41,14 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(UsuarioDTO dto)
         {
+            // El formulario de login solo envía Correo y Contraseña.
+            // El resto de campos de UsuarioDTO (Nombre, IdRol, etc.) son
+            // requeridos para el CRUD de usuarios, no para el login,
+            // así que se excluyen de la validación aquí.
+            ModelState.Remove(nameof(dto.Nombre));
+            ModelState.Remove(nameof(dto.IdRol));
+            ModelState.Remove(nameof(dto.IdEstadoUsuario));
+
             if (!ModelState.IsValid) return View(dto);
 
             var usuario = await _usuarioService.ValidarLoginAsync(dto.Correo, dto.Contrasena ?? string.Empty);

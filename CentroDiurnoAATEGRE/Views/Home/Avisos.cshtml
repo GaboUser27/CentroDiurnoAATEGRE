@@ -1,0 +1,59 @@
+﻿@using CentroDiurnoAATEGRE.Infraestructure.Models
+@{
+    ViewData["Title"] = "Avisos y Comunicados";
+    ViewData["ActivePage"] = "Avisos";
+    var avisos = ViewBag.Avisos as IEnumerable<Aviso>;
+}
+
+<div style="background:linear-gradient(135deg,var(--azul-oscuro),var(--azul));padding:5rem 0 4rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:white;clip-path:ellipse(55% 100% at 50% 100%);"></div>
+    <div class="container text-center position-relative">
+        <div class="hero-eyebrow d-inline-flex mb-3">
+            <i class="bi bi-megaphone-fill me-2"></i>Información relevante
+        </div>
+        <h1 style="font-family:'Playfair Display',serif;color:white;font-size:clamp(1.8rem,4vw,2.8rem);">
+            Avisos y Comunicados
+        </h1>
+        <p style="color:rgba(255,255,255,.75);max-width:520px;margin:.75rem auto 0;">
+            Mantente al tanto de las últimas noticias y comunicados del Centro Diurno.
+        </p>
+    </div>
+</div>
+
+<section class="seccion-avisos" style="padding-top:4rem;">
+    <div class="container">
+        <div class="row g-4">
+            @if (avisos != null && avisos.Any())
+            {
+                foreach (var aviso in avisos)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <div class="aviso-card">
+                            <div class="aviso-badge"><i class="bi bi-bell-fill"></i> Aviso</div>
+                            <h4 class="aviso-titulo">@aviso.Titulo</h4>
+                            <p class="aviso-contenido">@aviso.Contenido</p>
+                            <div class="aviso-fecha">
+                                <i class="bi bi-calendar3"></i>
+                                Publicado: @aviso.FechaPublicacion.ToString("dd/MM/yyyy")
+                                @if (aviso.FechaExpiracion != null)
+                                {
+                                    <span class="ms-2"><i class="bi bi-clock"></i> Vence: @aviso.FechaExpiracion.Value.ToString("dd/MM/yyyy")</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12">
+                    <div class="estado-vacio">
+                        <i class="bi bi-megaphone"></i>
+                        <h4>No hay avisos publicados</h4>
+                        <p>Cuando el equipo administrativo publique avisos vigentes, aparecerán en esta sección.</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

@@ -1394,3 +1394,30 @@ img {
     outline-offset: 3px;
     border-radius: 4px;
 }
+#carouselAvisos {
+    min-height: 260px;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+    #carouselAvisos .carousel-item {
+        min-height: 260px;
+        background: #ffffff;
+    }
+
+    #carouselAvisos h3 {
+        color: #0d6efd;
+    }
+
+    #carouselAvisos p {
+        max-width: 850px;
+        margin: auto;
+        color: #555;
+    }
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #0d6efd;
+    border-radius: 50%;
+    padding: 18px;
+}
