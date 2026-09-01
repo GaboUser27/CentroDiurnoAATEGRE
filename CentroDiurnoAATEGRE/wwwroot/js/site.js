@@ -43,18 +43,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     });
 });
-document.addEventListener('DOMContentLoaded', function () {
-
-    var carousel = document.querySelector('#carouselAvisos');
-
-    new bootstrap.Carousel(carousel, {
-
-        interval: 4000,
-
-        pause: "hover",
-
-        ride: "carousel"
-
-    });
-
-});

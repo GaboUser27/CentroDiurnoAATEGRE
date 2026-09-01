@@ -2,7 +2,7 @@
     ViewData["Title"] = "Inicio";
     ViewData["ActivePage"] = "Index";
     var info = ViewBag.Informacion;
-    var avisos = ViewBag.Avisos as IEnumerable<CentroDiurnoAATEGRE.Infraestructure.Models.Aviso>;
+    var avisos = ViewBag.Avisos as IEnumerable<CentroDiurnoAATEGRE.Application.DTOs.AvisoDTO>;
     var imagenes = ViewBag.Imagenes as IEnumerable<CentroDiurnoAATEGRE.Application.DTOs.ImagenDTO>;
     var tituloCentro = info?.Titulo ?? "AATEGRE Centro Diurno";
     var descripcionCentro = info?.Contenido ?? "Configure la historia y descripción del centro desde el panel administrativo para mostrarla aquí.";

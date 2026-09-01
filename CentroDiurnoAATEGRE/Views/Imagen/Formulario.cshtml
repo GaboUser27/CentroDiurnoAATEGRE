@@ -35,6 +35,7 @@
                       asp-action="@(esEdicion ? "Editar" : "Crear")"
                       asp-route-id="@Model.IdImagen" class="form-admin">
                     @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="IdImagen" />
                     <div class="mb-4">
                         <label class="form-label" for="archivo">
                             <i class="bi bi-cloud-upload me-1"></i>

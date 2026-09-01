@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace CentroDiurnoAATEGRE.Application.DTOs
 {
@@ -25,10 +26,13 @@ namespace CentroDiurnoAATEGRE.Application.DTOs
 
         public byte[]? Imagen1 { get; set; }
 
-        public virtual CategoriaImagenDTO IdCategoriaImagenNavigation { get; set; } = null!;
+        // Solo se usa para mostrar el nombre de la categoría en listados;
+        // nunca se envía desde el formulario, así que no debe validarse.
+        [ValidateNever]
+        public virtual CategoriaImagenDTO? IdCategoriaImagenNavigation { get; set; }
 
-        public string? ImagenBase64 => Imagen1 != null && Imagen1.Length > 0 
-            ? $"data:image/jpeg;base64,{Convert.ToBase64String(Imagen1)}" 
+        public string? ImagenBase64 => Imagen1 != null && Imagen1.Length > 0
+            ? $"data:image/jpeg;base64,{Convert.ToBase64String(Imagen1)}"
             : null;
     }
 }

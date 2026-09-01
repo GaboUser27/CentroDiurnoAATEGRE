@@ -36,6 +36,7 @@
                 <form method="post" asp-action="@(esEdicion ? "Editar" : "Crear")"
                       asp-route-id="@Model.IdCategoriaImagen" class="form-admin">
                     @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="IdCategoriaImagen" />
                     <div class="mb-4">
                         <label class="form-label" asp-for="Nombre">
                             <i class="bi bi-folder me-1"></i>Nombre de la categoría
