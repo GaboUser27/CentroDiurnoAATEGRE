@@ -163,6 +163,7 @@
 
 @section Scripts {
     <script>
+        const esEdicion = @(esEdicion ? "true" : "false");
         let dt = new DataTransfer();
         const inputArchivos = document.getElementById('archivos');
         const dropzone = document.getElementById('dropzone');
@@ -178,7 +179,9 @@
             }
 
             previewContainer.style.display = 'block';
-            previewCount.innerHTML = `<i class="bi bi-images me-1"></i>${dt.files.length} ${dt.files.length === 1 ? 'imagen seleccionada' : 'imágenes seleccionadas'}`;
+            previewCount.innerHTML = esEdicion
+                ? `<i class="bi bi-arrow-repeat me-1"></i>Nueva imagen seleccionada para reemplazar`
+                : `<i class="bi bi-images me-1"></i>${dt.files.length} ${dt.files.length === 1 ? 'imagen seleccionada' : 'imágenes seleccionadas'}`;
 
             Array.from(dt.files).forEach((file, index) => {
                 const card = document.createElement('div');
@@ -222,10 +225,14 @@
         }
 
         function agregarArchivos(archivosNuevos) {
+            if (esEdicion) {
+                dt = new DataTransfer(); // en edición se reemplaza
+            }
             for (let i = 0; i < archivosNuevos.length; i++) {
                 const f = archivosNuevos[i];
                 if (f.type.startsWith('image/')) {
                     dt.items.add(f);
+                    if (esEdicion) break; // en edición solo se toma 1
                 }
             }
             inputArchivos.files = dt.files;

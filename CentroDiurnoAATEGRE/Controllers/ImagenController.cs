@@ -51,14 +51,14 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
 
         // ── ADMIN ──────────────────────────────────────────────────────
 
-        [Authorize]
+        [HttpGet, Authorize]
         public async Task<IActionResult> Index()
         {
             var dtos = await _imagenService.ObtenerConCategoriaAsync();
             return View(dtos);
         }
 
-        [Authorize]
+        [HttpGet, Authorize]
         public async Task<IActionResult> Crear()
         {
             await CargarCategoriasAsync();
@@ -128,7 +128,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize]
+        [HttpGet, Authorize]
         public async Task<IActionResult> Editar(int id)
         {
             var dto = await _imagenService.ObtenerPorIdAsync(id);
@@ -139,20 +139,24 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         }
 
         [HttpPost, Authorize, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Editar(int id, ImagenDTO dto, IFormFile? archivo)
+        public async Task<IActionResult> Editar(int id, ImagenDTO dto, List<IFormFile>? archivos, IFormFile? archivo)
         {
+            var archivoSubido = (archivos != null && archivos.Count > 0)
+                ? archivos.FirstOrDefault(a => a != null && a.Length > 0)
+                : (archivo != null && archivo.Length > 0 ? archivo : null);
+
             if (!ModelState.IsValid) { await CargarCategoriasAsync(); return View("Formulario", dto); }
 
             byte[]? bytes = null;
-            if (archivo != null && archivo.Length > 0)
+            if (archivoSubido != null)
             {
-                if (!EsImagenValida(archivo))
+                if (!EsImagenValida(archivoSubido))
                 {
-                    ModelState.AddModelError("archivo", "Solo se permiten imágenes (jpg, png, webp, gif).");
+                    ModelState.AddModelError("archivos", "Solo se permiten imágenes (jpg, png, webp, gif).");
                     await CargarCategoriasAsync();
                     return View("Formulario", dto);
                 }
-                bytes = await LeerBytesAsync(archivo);
+                bytes = await LeerBytesAsync(archivoSubido);
             }
 
             await _imagenService.EditarAsync(id, dto, bytes);
@@ -160,7 +164,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize]
+        [HttpGet, Authorize]
         public async Task<IActionResult> Eliminar(int id)
         {
             await _imagenService.EliminarAsync(id);

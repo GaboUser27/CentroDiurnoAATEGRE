@@ -5,76 +5,111 @@
     var categorias = ViewBag.Categorias as IEnumerable<CentroDiurnoAATEGRE.Application.DTOs.CategoriaImagenDTO>;
 }
 
-<div style="background:linear-gradient(135deg,var(--azul-oscuro),var(--azul));padding:5rem 0 3rem;position:relative;overflow:hidden;">
-    <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:white;clip-path:ellipse(55% 100% at 50% 100%);"></div>
-    <div class="container text-center position-relative">
+<!-- Encabezado Hero de la Galería -->
+<div class="galeria-hero-header">
+    <div class="galeria-hero-formas">
+        <div class="hero-circulo hero-circulo-1"></div>
+        <div class="hero-circulo hero-circulo-2"></div>
+        <div class="hero-lila"></div>
+    </div>
+    
+    <div class="container text-center galeria-hero-contenido">
         <div class="hero-eyebrow d-inline-flex mb-3">
-            <i class="bi bi-images me-2"></i>Momentos especiales
+            <i class="bi bi-stars me-2"></i>Momentos Especiales
         </div>
-        <h1 style="font-family:'Playfair Display',serif;color:white;font-size:clamp(1.8rem,4vw,2.8rem);">
+        <h1 class="galeria-hero-titulo mb-3">
             Galería de Actividades
         </h1>
-        <p style="color:rgba(255,255,255,.75);max-width:520px;margin:.75rem auto 0;">
-            Descubre los momentos de alegría, aprendizaje y convivencia que vivimos cada día.
+        <p class="galeria-hero-subtitulo mx-auto">
+            Descubre los momentos de alegría, aprendizaje y convivencia que vivimos cada día en el Centro Diurno AATEGRE.
         </p>
     </div>
+
+    <div class="galeria-wave-curve"></div>
 </div>
 
 <div class="container py-5">
+    <!-- Barra de Filtros por Categoría -->
     @if (categorias?.Any() == true)
     {
-        <div class="text-center mb-5">
-            <h5 class="mb-3" style="font-family:'Playfair Display',serif;color:var(--azul-oscuro);">Filtrar por categoría</h5>
+        <div class="galeria-filtros-seccion text-center mb-5">
+            <p class="text-uppercase fw-bold mb-2" style="color:var(--azul); font-size:0.82rem; letter-spacing:.08em;">
+                <i class="bi bi-funnel-fill me-1"></i>Explorar por categorías
+            </p>
+            <h3 class="galeria-filtros-titulo mb-4">Filtrar Actividades</h3>
+            
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 <a href="@Url.Action("Galeria")"
                    class="categoria-chip @(ViewBag.CategoriaActual == null ? "activo" : "")">
-                    <i class="bi bi-grid-fill"></i>Todas
+                    <i class="bi bi-grid-fill me-1"></i>Todas las fotos
                 </a>
                 @foreach (var cat in categorias)
                 {
                     <a href="@Url.Action("Galeria", new { categoriaId = cat.IdCategoriaImagen })"
                        class="categoria-chip @(ViewBag.CategoriaActual == cat.IdCategoriaImagen ? "activo" : "")">
-                        <i class="bi bi-folder-fill"></i>@cat.Nombre
+                        <i class="bi bi-folder2-open me-1"></i>@cat.Nombre
                     </a>
                 }
             </div>
         </div>
     }
 
+    <!-- Banner de Categoría Activa -->
     @if (ViewBag.CategoriaActual != null && ViewBag.NombreCategoria != null)
     {
-        <div class="mb-4">
-            <h4 style="font-family:'Playfair Display',serif;color:var(--azul-oscuro);">
-                <i class="bi bi-folder-open-fill me-2" style="color:var(--lila)"></i>@ViewBag.NombreCategoria
-            </h4>
-            @if (ViewBag.DescripcionCategoria != null)
-            {
-                <p style="color:var(--texto-suave);">@ViewBag.DescripcionCategoria</p>
-            }
+        <div class="categoria-banner-activa mb-5">
+            <div class="d-flex align-items-center gap-3">
+                <div class="categoria-banner-icon">
+                    <i class="bi bi-folder-check"></i>
+                </div>
+                <div>
+                    <span class="badge-conteo mb-1"><i class="bi bi-tag-fill me-1"></i>Categoría seleccionada</span>
+                    <h4 class="categoria-banner-nombre mb-1">@ViewBag.NombreCategoria</h4>
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.DescripcionCategoria))
+                    {
+                        <p class="categoria-banner-desc mb-0">@ViewBag.DescripcionCategoria</p>
+                    }
+                </div>
+            </div>
         </div>
     }
 
+    <!-- Cuadrícula de Fotografías -->
     @if (Model?.Any() == true)
     {
-        <div class="row g-3">
+        <div class="row g-4">
             @foreach (var img in Model)
             {
                 <div class="col-sm-6 col-md-4 col-lg-3">
-                    <div class="galeria-item" style="aspect-ratio:1;border-radius:12px;overflow:hidden;cursor:pointer;"
+                    <div class="galeria-card-publica"
                          data-bs-toggle="modal" data-bs-target="#modalImagen"
-                         onclick="verImagen('@img.ImagenBase64','@img.Titulo','@img.Descripcion')">
+                         onclick="verImagen('@img.ImagenBase64','@Html.Raw(Html.Encode(img.Titulo))','@Html.Raw(Html.Encode(img.Descripcion ?? ""))','@img.FechaImagen.ToString("dd MMMM, yyyy")','@(img.IdCategoriaImagenNavigation?.Nombre ?? "")')">
                         @if (img.ImagenBase64 != null)
                         {
-                            <img src="@img.ImagenBase64" alt="@img.Titulo"
-                                 style="width:100%;height:100%;object-fit:cover;" />
+                            <img src="@img.ImagenBase64" alt="@img.Titulo" class="galeria-card-img" loading="lazy" />
                         }
                         else
                         {
-                            <div style="width:100%;height:100%;background:var(--gris);display:flex;align-items:center;justify-content:center;">
-                                <i class="bi bi-image" style="font-size:3rem;color:var(--gris-borde);"></i>
+                            <div class="galeria-card-placeholder">
+                                <i class="bi bi-image"></i>
                             </div>
                         }
-                        <div class="galeria-overlay">📷 @img.Titulo</div>
+                        
+                        <div class="galeria-card-overlay">
+                            <div class="d-flex justify-content-end">
+                                <span class="galeria-zoom-badge" title="Ampliar imagen">
+                                    <i class="bi bi-arrows-fullscreen"></i>
+                                </span>
+                            </div>
+                            <div>
+                                <h6 class="galeria-card-titulo mb-1">@img.Titulo</h6>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="galeria-card-fecha">
+                                        <i class="bi bi-calendar3 me-1"></i>@img.FechaImagen.ToString("dd/MM/yyyy")
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             }
@@ -82,27 +117,42 @@
     }
     else
     {
-        <div class="text-center py-5">
-            <i class="bi bi-images" style="font-size:4rem;color:var(--gris-borde);"></i>
-            <h5 class="mt-3" style="color:var(--texto-suave);">No hay imágenes publicadas</h5>
-            <p class="text-muted mb-0">Cuando se agreguen imágenes desde el panel administrativo, aparecerán en esta galería.</p>
+        <div class="estado-vacio-moderno text-center py-5">
+            <div class="estado-vacio-icono mb-3">
+                <i class="bi bi-images"></i>
+            </div>
+            <h4>No hay fotografías disponibles</h4>
+            <p class="text-muted mb-0">No se encontraron imágenes publicadas para la categoría seleccionada.</p>
+            @if (ViewBag.CategoriaActual != null)
+            {
+                <div class="mt-3">
+                    <a href="@Url.Action("Galeria")" class="btn-primario">
+                        <i class="bi bi-grid-fill"></i>Ver todas las fotos
+                    </a>
+                </div>
+            }
         </div>
     }
 </div>
 
-<div class="modal fade" id="modalImagen" tabindex="-1">
+<!-- Modal Lightbox en Alta Definición -->
+<div class="modal fade modal-galeria-aategre" id="modalImagen" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 rounded-4 overflow-hidden">
-            <div class="modal-header border-0" style="background:var(--azul);color:white;padding:1rem 1.5rem;">
-                <h5 class="modal-title" id="modalTitulo" style="font-family:'Playfair Display',serif;"></h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg">
+            <div class="modal-header border-0 bg-dark text-white px-4 py-3 d-flex align-items-center justify-content-between">
+                <div>
+                    <span id="modalCategoria" class="badge-panel mb-1"></span>
+                    <h5 class="modal-title mb-0" id="modalTitulo" style="font-family:'Playfair Display',serif; font-size:1.3rem;"></h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body p-0 text-center" style="background:#1a1a2e;">
-                <img id="modalFoto" src="" alt=""
-                     style="max-width:100%;max-height:75vh;object-fit:contain;" />
+            <div class="modal-body p-0 text-center bg-black d-flex align-items-center justify-content-center" style="min-height:350px;">
+                <img id="modalFoto" src="" alt="Fotografía ampliada" class="img-fluid"
+                     style="max-height:75vh; width:auto; object-fit:contain;" />
             </div>
-            <div class="modal-footer border-0" style="padding:1rem 1.5rem;">
-                <p id="modalDesc" class="text-muted mb-0 small"></p>
+            <div class="modal-footer border-0 bg-dark text-white px-4 py-3 d-flex justify-content-between align-items-center">
+                <p id="modalDesc" class="mb-0 text-white-50 small"></p>
+                <span id="modalFecha" class="small text-white-50"><i class="bi bi-calendar3 me-1"></i></span>
             </div>
         </div>
     </div>
@@ -110,10 +160,19 @@
 
 @section Scripts {
     <script>
-        function verImagen(base64, titulo, descripcion) {
+        function verImagen(base64, titulo, descripcion, fecha, categoria) {
             document.getElementById('modalFoto').src = base64 || '';
             document.getElementById('modalTitulo').textContent = titulo;
-            document.getElementById('modalDesc').textContent = descripcion || '';
+            document.getElementById('modalDesc').textContent = descripcion || 'Sin descripción adicional.';
+            document.getElementById('modalFecha').innerHTML = `<i class="bi bi-calendar3 me-1"></i>${fecha}`;
+            
+            const catElem = document.getElementById('modalCategoria');
+            if (categoria) {
+                catElem.textContent = categoria;
+                catElem.style.display = 'inline-flex';
+            } else {
+                catElem.style.display = 'none';
+            }
         }
     </script>
 }
