@@ -51,6 +51,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
         {
             var aviso = await _repo.ObtenerPorIdAsync(id)
                 ?? throw new KeyNotFoundException($"Aviso {id} no encontrado.");
+            dto.IdAviso = id; 
             _mapper.Map(dto, aviso);
             await _repo.ActualizarAsync(aviso);
         }

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<CentroDiurnoAATEGRE.Application.DTOs.CategoriaImagenDTO>
+@{
     ViewData["Title"] = "Categorías de Galería";
 }
 
@@ -49,7 +50,7 @@
                             </div>
                             <div>
                                 <h5 class="mb-0" style="font-family:'Playfair Display',serif;">@cat.Nombre</h5>
-                                <small class="text-muted">@cat.Imagenes.Count imagen(es)</small>
+                                <small class="text-muted">@cat.Imagen.Count imagen(es)</small>
                             </div>
                         </div>
                         @if (!string.IsNullOrEmpty(cat.Descripcion))

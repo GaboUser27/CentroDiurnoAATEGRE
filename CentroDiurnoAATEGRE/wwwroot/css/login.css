@@ -1,0 +1,19 @@
+﻿.campo-error {
+    display: none;
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 6px;
+}
+
+    .campo-error.mostrar {
+        display: block;
+    }
+
+.form-control.input-error {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.15rem rgba(220, 53, 69, 0.15);
+}
+
+.form-control.input-valido {
+    border-color: #198754;
+}

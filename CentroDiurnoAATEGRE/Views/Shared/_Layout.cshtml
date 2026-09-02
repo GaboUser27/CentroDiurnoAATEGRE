@@ -52,6 +52,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link @(ViewData["ActivePage"]?.ToString() == "Avisos" ? "active" : "")"
+                           asp-controller="Home" asp-action="Avisos">
+                            <i class="bi bi-megaphone me-1"></i>Avisos
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link @(ViewData["ActivePage"]?.ToString() == "Contacto" ? "active" : "")"
                            asp-controller="Home" asp-action="Contacto">
                             <i class="bi bi-envelope-heart me-1"></i>Contacto
@@ -102,7 +108,7 @@
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
                     <div class="footer-logo">
-                        <img src="~/images/logo AATEGRE.png" alt="AATEGRE Centro Diurno" />
+                        <img src="~/images/logo_AATEGRE-sin-fondo.png" alt="AATEGRE Centro Diurno" />
                     </div>
                     <span class="footer-nombre">AATEGRE Centro Diurno</span>
                     <p class="footer-slogan">Cuidado integral con calidez humana para nuestros adultos mayores.</p>
@@ -117,6 +123,7 @@
                         <li><a asp-controller="Home" asp-action="Index"><i class="bi bi-chevron-right"></i>Inicio</a></li>
                         <li><a asp-controller="Home" asp-action="QuienesSomos"><i class="bi bi-chevron-right"></i>Quiénes Somos</a></li>
                         <li><a asp-controller="Imagen" asp-action="Galeria"><i class="bi bi-chevron-right"></i>Actividades</a></li>
+                        <li><a asp-controller="Home" asp-action="Avisos"><i class="bi bi-chevron-right"></i>Avisos</a></li>
                         <li><a asp-controller="Home" asp-action="Contacto"><i class="bi bi-chevron-right"></i>Contacto</a></li>
                     </ul>
                 </div>

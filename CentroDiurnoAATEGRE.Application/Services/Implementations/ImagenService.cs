@@ -58,6 +58,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
             var imagen = await _repo.ObtenerPorIdAsync(id)
                 ?? throw new KeyNotFoundException($"Imagen {id} no encontrada.");
 
+            dto.IdImagen = id; // el id de la ruta siempre manda, evita que el DTO pise la clave primaria
             var bytesAnteriores = imagen.Imagen1;
             _mapper.Map(dto, imagen);
 

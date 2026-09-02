@@ -26,6 +26,7 @@
                 <form method="post" asp-action="@(esEdicion ? "Editar" : "Crear")"
                       asp-route-id="@Model.IdAviso" class="form-admin">
                     @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="IdAviso" />
                     <div class="mb-4">
                         <label class="form-label" asp-for="Titulo">
                             <i class="bi bi-fonts me-1"></i>Título del aviso

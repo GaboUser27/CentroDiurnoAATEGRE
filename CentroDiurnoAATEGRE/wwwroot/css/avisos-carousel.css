@@ -1,0 +1,338 @@
+﻿/* =============================================
+   AATEGRE — Carrusel de Avisos "Spotlight"
+   Usa la paleta de site.css (--azul, --lila, etc.)
+   ============================================= */
+
+.carrusel-wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.carrusel-contador {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.carrusel-contador-texto {
+    font-family: 'Lato', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--texto-suave);
+}
+
+    .carrusel-contador-texto span {
+        color: var(--azul);
+        font-size: 0.95rem;
+    }
+
+.carrusel-progreso {
+    flex: 1;
+    height: 3px;
+    background: var(--gris-borde);
+    border-radius: 3px;
+    margin-left: 1.25rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.carrusel-progreso-barra {
+    position: absolute;
+    inset: 0;
+    width: 0%;
+    background: linear-gradient(90deg, var(--azul), var(--lila));
+    border-radius: 3px;
+}
+
+    .carrusel-progreso-barra.animando {
+        transition: width 6s linear;
+        width: 100%;
+    }
+
+/* ── Viewport / Track ── */
+.carrusel-viewport {
+    overflow: hidden;
+    border-radius: 28px;
+    box-shadow: var(--sombra-hover);
+    position: relative;
+}
+
+.carrusel-track {
+    display: flex;
+    transition: transform 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+    will-change: transform;
+}
+
+.carrusel-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+}
+
+/* ── Card interna: panel dividido ── */
+.carrusel-card {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    min-height: 380px;
+    background: var(--blanco);
+}
+
+.carrusel-panel {
+    position: relative;
+    background: linear-gradient(150deg, var(--azul-oscuro) 0%, var(--azul) 65%, var(--azul-medio) 100%);
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    color: white;
+}
+
+    .carrusel-panel::before {
+        content: '';
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.08);
+        top: -80px;
+        right: -80px;
+    }
+
+    .carrusel-panel::after {
+        content: '';
+        position: absolute;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.07);
+        bottom: -50px;
+        left: -40px;
+    }
+
+.carrusel-icono {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    z-index: 1;
+}
+
+.carrusel-eyebrow {
+    position: relative;
+    z-index: 1;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 0.4rem;
+}
+
+.carrusel-panel-numero {
+    position: relative;
+    z-index: 1;
+    font-family: 'Playfair Display', serif;
+    font-size: 3.4rem;
+    line-height: 1;
+    opacity: 0.9;
+}
+
+.carrusel-panel-fechas {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    opacity: 0.92;
+}
+
+    .carrusel-panel-fechas i {
+        margin-right: 0.4rem;
+    }
+
+/* ── Contenido derecho ── */
+.carrusel-contenido {
+    padding: 3rem 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.carrusel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    align-self: flex-start;
+    background: var(--azul-claro);
+    color: var(--azul);
+    padding: 0.3rem 0.85rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 1.1rem;
+}
+
+.carrusel-titulo {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+    color: var(--texto);
+    margin-bottom: 1rem;
+    line-height: 1.25;
+}
+
+.carrusel-texto {
+    font-size: 1.02rem;
+    color: var(--texto-suave);
+    line-height: 1.75;
+}
+
+/* ── Slide activo: animación de entrada del contenido ── */
+.carrusel-slide .carrusel-badge,
+.carrusel-slide .carrusel-titulo,
+.carrusel-slide .carrusel-texto {
+    opacity: 0;
+    transform: translateY(14px);
+}
+
+.carrusel-slide.activo .carrusel-badge {
+    animation: carruselFadeUp 0.55s ease 0.15s forwards;
+}
+
+.carrusel-slide.activo .carrusel-titulo {
+    animation: carruselFadeUp 0.55s ease 0.25s forwards;
+}
+
+.carrusel-slide.activo .carrusel-texto {
+    animation: carruselFadeUp 0.55s ease 0.35s forwards;
+}
+
+@keyframes carruselFadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Controles ── */
+.carrusel-controles {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.75rem;
+}
+
+.carrusel-flecha {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--azul-claro);
+    background: var(--blanco);
+    color: var(--azul);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    cursor: pointer;
+    transition: all var(--transicion);
+    flex-shrink: 0;
+}
+
+    .carrusel-flecha:hover {
+        background: var(--azul);
+        border-color: var(--azul);
+        color: white;
+        transform: scale(1.08);
+    }
+
+    .carrusel-flecha:active {
+        transform: scale(0.96);
+    }
+
+.carrusel-dots {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.carrusel-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50px;
+    background: var(--gris-borde);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all var(--transicion);
+}
+
+    .carrusel-dot:hover {
+        background: var(--azul-medio);
+    }
+
+    .carrusel-dot.activo {
+        width: 28px;
+        background: linear-gradient(90deg, var(--azul), var(--lila));
+    }
+
+/* ── Estado vacío conservado desde el diseño original ── */
+.carrusel-vacio {
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767.98px) {
+    .carrusel-card {
+        grid-template-columns: 1fr;
+    }
+
+    .carrusel-panel {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem 1.5rem;
+        gap: 1rem;
+    }
+
+    .carrusel-panel-numero {
+        display: none;
+    }
+
+    .carrusel-icono {
+        margin-bottom: 0;
+    }
+
+    .carrusel-panel-fechas {
+        flex-direction: row;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .carrusel-contenido {
+        padding: 2rem 1.5rem 2.25rem;
+    }
+
+    .carrusel-controles {
+        gap: 1rem;
+    }
+
+    .carrusel-flecha {
+        width: 42px;
+        height: 42px;
+    }
+}

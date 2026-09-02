@@ -1,0 +1,102 @@
+﻿@using CentroDiurnoAATEGRE.Application.DTOs
+@{
+    ViewData["Title"] = "Avisos y Comunicados";
+    ViewData["ActivePage"] = "Avisos";
+    var avisos = ViewBag.Avisos as IEnumerable<AvisoDTO>;
+}
+
+<div style="background:linear-gradient(135deg,var(--azul-oscuro),var(--azul));padding:5rem 0 4rem;position:relative;overflow:hidden;">
+    <div style="position:absolute;bottom:0;left:0;right:0;height:60px;background:white;clip-path:ellipse(55% 100% at 50% 100%);"></div>
+    <div class="container text-center position-relative">
+        <div class="hero-eyebrow d-inline-flex mb-3">
+            <i class="bi bi-megaphone-fill me-2"></i>Información relevante
+        </div>
+        <h1 style="font-family:'Playfair Display',serif;color:white;font-size:clamp(1.8rem,4vw,2.8rem);">
+            Avisos y Comunicados
+        </h1>
+        <p style="color:rgba(255,255,255,.75);max-width:520px;margin:.75rem auto 0;">
+            Mantente al tanto de las últimas noticias y comunicados del Centro Diurno.
+        </p>
+    </div>
+</div>
+
+<section class="seccion-avisos" style="padding-top:4rem;">
+    <div class="container">
+        @if (avisos != null && avisos.Any())
+        {
+            var listaAvisos = avisos.ToList();
+            <div class="carrusel-wrap" data-carrusel-avisos>
+
+                <div class="carrusel-contador">
+                    <div class="carrusel-contador-texto">
+                        Aviso <span class="carrusel-num-actual">01</span> / @listaAvisos.Count.ToString("D2")
+                    </div>
+                    <div class="carrusel-progreso">
+                        <div class="carrusel-progreso-barra"></div>
+                    </div>
+                </div>
+
+                <div class="carrusel-viewport">
+                    <div class="carrusel-track">
+                        @foreach (var aviso in listaAvisos)
+                        {
+                            <div class="carrusel-slide">
+                                <div class="carrusel-card">
+                                    <div class="carrusel-panel">
+                                        <div>
+                                            <div class="carrusel-icono"><i class="bi bi-bell-fill"></i></div>
+                                            <div class="carrusel-eyebrow">Comunicado</div>
+                                            <div class="carrusel-panel-numero d-none d-md-block">
+                                                @((listaAvisos.IndexOf(aviso) + 1).ToString("D2"))
+                                            </div>
+                                        </div>
+                                        <div class="carrusel-panel-fechas">
+                                            <span><i class="bi bi-calendar3"></i>Publicado: @aviso.FechaPublicacion.ToString("dd/MM/yyyy")</span>
+                                            @if (aviso.FechaExpiracion != null)
+                                            {
+                                                <span><i class="bi bi-clock"></i>Vence: @aviso.FechaExpiracion.Value.ToString("dd/MM/yyyy")</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="carrusel-contenido">
+                                        <span class="carrusel-badge"><i class="bi bi-megaphone-fill"></i> Aviso</span>
+                                        <h3 class="carrusel-titulo">@aviso.Titulo</h3>
+                                        <p class="carrusel-texto">@aviso.Contenido</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="carrusel-controles">
+                    <button type="button" class="carrusel-flecha carrusel-flecha--prev" aria-label="Aviso anterior">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <div class="carrusel-dots"></div>
+                    <button type="button" class="carrusel-flecha carrusel-flecha--next" aria-label="Aviso siguiente">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="carrusel-vacio">
+                <div class="estado-vacio">
+                    <i class="bi bi-megaphone"></i>
+                    <h4>No hay avisos publicados</h4>
+                    <p>Cuando el equipo administrativo publique avisos vigentes, aparecerán en esta sección.</p>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/avisos-carousel.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/avisos-carousel.js" asp-append-version="true"></script>
+}

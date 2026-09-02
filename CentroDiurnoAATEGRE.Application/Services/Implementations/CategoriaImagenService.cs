@@ -50,6 +50,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
         {
             var cat = await _repo.ObtenerPorIdAsync(id)
                 ?? throw new KeyNotFoundException($"Categoría {id} no encontrada.");
+            dto.IdCategoriaImagen = id; // el id de la ruta siempre manda, evita que el DTO pise la clave primaria
             _mapper.Map(dto, cat);
             await _repo.ActualizarAsync(cat);
         }

@@ -62,11 +62,11 @@
                                 <td>@usuario.Correo</td>
                                 <td>
                                     <span style="background:var(--azul-claro);color:var(--azul);padding:.2rem .7rem;border-radius:50px;font-size:.8rem;font-weight:600;">
-                                        @usuario.Rol?.Nombre
+                                        @usuario.IdRolNavigation?.Nombre
                                     </span>
                                 </td>
                                 <td>
-                                    @if (usuario.EstadoUsuario?.Nombre == "Activo")
+                                    @if (usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo")
                                     {
                                         <span class="badge-activo">Activo</span>
                                     }
@@ -82,8 +82,8 @@
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <a asp-action="CambiarEstado" asp-route-id="@usuario.IdUsuario"
-                                           class="btn btn-sm @(usuario.EstadoUsuario?.Nombre == "Activo" ? "btn-outline-warning" : "btn-outline-success") rounded-2">
-                                            <i class="bi bi-toggle-@(usuario.EstadoUsuario?.Nombre == "Activo" ? "on" : "off")"></i>
+                                           class="btn btn-sm @(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "btn-outline-warning" : "btn-outline-success") rounded-2">
+                                            <i class="bi bi-toggle-@(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "on" : "off")"></i>
                                         </a>
                                     </div>
                                 </td>
