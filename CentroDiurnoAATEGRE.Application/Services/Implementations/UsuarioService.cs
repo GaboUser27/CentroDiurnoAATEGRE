@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using BCrypt.Net;
 using CentroDiurnoAATEGRE.Application.DTOs;
 using CentroDiurnoAATEGRE.Application.Services.Interfaces;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
@@ -44,7 +45,35 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
             var usuario = await _repo.ObtenerPorCorreoAsync(correo);
             if (usuario == null) return null;
             if (usuario.IdEstadoUsuarioNavigation?.Nombre != "Activo") return null;
-            if (usuario.Contrasena != contrasena) return null;
+
+            bool esValida = false;
+
+            // Verificar si la contraseña almacenada está en formato hash BCrypt
+            if (!string.IsNullOrEmpty(usuario.Contrasena) &&
+                (usuario.Contrasena.StartsWith("$2a$") || usuario.Contrasena.StartsWith("$2b$") || usuario.Contrasena.StartsWith("$2y$")))
+            {
+                try
+                {
+                    esValida = BCrypt.Net.BCrypt.Verify(contrasena, usuario.Contrasena);
+                }
+                catch
+                {
+                    esValida = false;
+                }
+            }
+            else
+            {
+                // Compatibilidad hacia atrás para contraseñas existentes antes de la encriptación
+                if (usuario.Contrasena == contrasena)
+                {
+                    esValida = true;
+                    // Auto-migrar la contraseña a hash BCrypt en la base de datos
+                    usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(contrasena);
+                    await _repo.ActualizarAsync(usuario);
+                }
+            }
+
+            if (!esValida) return null;
 
             return _mapper.Map<UsuarioDTO>(usuario);
         }
@@ -52,6 +81,10 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
         public async Task CrearAsync(UsuarioDTO dto)
         {
             var usuario = _mapper.Map<Usuario>(dto);
+            if (!string.IsNullOrWhiteSpace(dto.Contrasena))
+            {
+                usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena);
+            }
             await _repo.AgregarAsync(usuario);
         }
 
@@ -64,7 +97,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
             _mapper.Map(dto, usuario);
 
             usuario.Contrasena = !string.IsNullOrWhiteSpace(dto.Contrasena)
-                ? dto.Contrasena
+                ? BCrypt.Net.BCrypt.HashPassword(dto.Contrasena)
                 : contrasenaActual;
 
             await _repo.ActualizarAsync(usuario);

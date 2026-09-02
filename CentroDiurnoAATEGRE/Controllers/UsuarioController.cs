@@ -30,7 +30,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
 
         // ── LOGIN ──────────────────────────────────────────────────────
 
-        [AllowAnonymous]
+        [HttpGet, AllowAnonymous]
         public IActionResult Login()
         {
             if (User.Identity?.IsAuthenticated == true)
@@ -74,7 +74,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction("Dashboard", "Home");
         }
 
-        [Authorize]
+        [HttpGet, Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("CookieAuth");
@@ -83,14 +83,14 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
 
         // ── CRUD ───────────────────────────────────────────────────────
 
-        [Authorize]
+        [HttpGet, Authorize]
         public async Task<IActionResult> Index()
         {
             var dtos = await _usuarioService.ObtenerTodosAsync();
             return View(dtos);
         }
 
-        [Authorize(Roles = "Administrador")]
+        [HttpGet, Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Crear()
         {
             await CargarSelectsAsync();
@@ -107,7 +107,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize]
+        [HttpGet, Authorize]
         public async Task<IActionResult> Editar(int id)
         {
             var dto = await _usuarioService.ObtenerPorIdAsync(id);
@@ -128,7 +128,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = "Administrador")]
+        [HttpGet, Authorize(Roles = "Administrador")]
         public async Task<IActionResult> CambiarEstado(int id)
         {
             await _usuarioService.CambiarEstadoAsync(id);
