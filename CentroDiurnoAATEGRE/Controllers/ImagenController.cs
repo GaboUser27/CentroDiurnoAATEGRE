@@ -66,24 +66,65 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         }
 
         [HttpPost, Authorize, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Crear(ImagenDTO dto, IFormFile? archivo)
+        public async Task<IActionResult> Crear(ImagenDTO dto, List<IFormFile>? archivos, IFormFile? archivo)
         {
-            if (!ModelState.IsValid) { await CargarCategoriasAsync(); return View("Formulario", dto); }
-
-            byte[]? bytes = null;
-            if (archivo != null && archivo.Length > 0)
+            var listaArchivos = new List<IFormFile>();
+            if (archivos != null && archivos.Count > 0)
             {
-                if (!EsImagenValida(archivo))
+                listaArchivos.AddRange(archivos.Where(a => a != null && a.Length > 0));
+            }
+            else if (archivo != null && archivo.Length > 0)
+            {
+                listaArchivos.Add(archivo);
+            }
+
+            if (listaArchivos.Count == 0)
+            {
+                ModelState.AddModelError("archivos", "Debe seleccionar al menos una imagen.");
+                await CargarCategoriasAsync();
+                return View("Formulario", dto);
+            }
+
+            foreach (var f in listaArchivos)
+            {
+                if (!EsImagenValida(f))
                 {
-                    ModelState.AddModelError("archivo", "Solo se permiten imágenes (jpg, png, webp, gif).");
+                    ModelState.AddModelError("archivos", $"El archivo '{f.FileName}' no es una imagen válida. Formatos permitidos: JPG, PNG, WebP y GIF.");
                     await CargarCategoriasAsync();
                     return View("Formulario", dto);
                 }
-                bytes = await LeerBytesAsync(archivo);
             }
 
-            await _imagenService.CrearAsync(dto, bytes);
-            TempData["Exito"] = "Imagen agregada a la galería.";
+            if (!ModelState.IsValid)
+            {
+                await CargarCategoriasAsync();
+                return View("Formulario", dto);
+            }
+
+            var tituloBase = string.IsNullOrWhiteSpace(dto.Titulo) ? "Imagen" : dto.Titulo.Trim();
+            int subidas = 0;
+
+            for (int i = 0; i < listaArchivos.Count; i++)
+            {
+                var file = listaArchivos[i];
+                var bytes = await LeerBytesAsync(file);
+
+                var nuevaImagen = new ImagenDTO
+                {
+                    IdCategoriaImagen = dto.IdCategoriaImagen,
+                    FechaImagen = dto.FechaImagen,
+                    Descripcion = dto.Descripcion,
+                    Titulo = listaArchivos.Count == 1 ? tituloBase : $"{tituloBase} ({i + 1})"
+                };
+
+                await _imagenService.CrearAsync(nuevaImagen, bytes);
+                subidas++;
+            }
+
+            TempData["Exito"] = subidas == 1
+                ? "Imagen agregada a la galería con éxito."
+                : $"{subidas} imágenes agregadas a la galería con éxito.";
+
             return RedirectToAction(nameof(Index));
         }
 
