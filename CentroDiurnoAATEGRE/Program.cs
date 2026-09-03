@@ -52,7 +52,7 @@ builder.Services.AddAuthentication("CookieAuth")
         options.Cookie.Name = "AATEGRE.Auth";
         options.LoginPath = "/Usuario/Login";
         options.LogoutPath = "/Usuario/Logout";
-        options.AccessDeniedPath = "/Home/Index";
+        options.AccessDeniedPath = "/Home/AccesoDenegado";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
     });

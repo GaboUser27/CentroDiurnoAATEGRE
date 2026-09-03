@@ -1,6 +1,7 @@
 using CentroDiurnoAATEGRE.Application.Services.Interfaces;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -86,6 +87,17 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         {
             ViewData["ActivePage"] = "Contacto";
             ViewBag.Informacion = await _infoService.ObtenerPrimeraAsync();
+            return View();
+        }
+
+        // GET: /Home/AccesoDenegado
+        // A donde redirige el sistema de autenticación cuando un usuario
+        // autenticado (ej. un Colaborador) intenta entrar a una acción
+        // reservada a otro rol (ej. [Authorize(Roles = "Administrador")]).
+        [AllowAnonymous]
+        public IActionResult AccesoDenegado()
+        {
+            Response.StatusCode = StatusCodes.Status403Forbidden;
             return View();
         }
 
