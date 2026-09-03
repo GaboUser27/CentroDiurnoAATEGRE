@@ -1,0 +1,16 @@
+# Permite a los buscadores indexar el sitio público, pero bloquea
+# el panel administrativo (no aporta nada a SEO y no debería aparecer
+# en resultados de búsqueda).
+User-agent: *
+Allow: /
+Disallow: /Usuario/
+Disallow: /Aviso/
+Disallow: /Imagen/Index
+Disallow: /Imagen/Formulario
+Disallow: /CategoriaImagen/
+Disallow: /InformacionInstitucional/
+Disallow: /Home/Dashboard
+
+# IMPORTANTE: reemplazar este dominio por el dominio real una vez
+# que el sitio esté en producción.
+Sitemap: https://www.aategre.cr/sitemap.xml

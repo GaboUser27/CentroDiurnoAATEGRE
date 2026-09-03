@@ -1,0 +1,20 @@
+@model CentroDiurnoAATEGRE.Application.DTOs.InformacionInstitucionalDTO?
+
+@if (!string.IsNullOrWhiteSpace(Model?.Facebook))
+{
+    <a href="@Model.Facebook" target="_blank" rel="noopener noreferrer"
+       class="rrss-btn fb" aria-label="Facebook de AATEGRE Centro Diurno (se abre en una pestaña nueva)">
+        <i class="bi bi-facebook"></i> Facebook
+    </a>
+}
+@if (!string.IsNullOrWhiteSpace(Model?.Instagram))
+{
+    <a href="@Model.Instagram" target="_blank" rel="noopener noreferrer"
+       class="rrss-btn ig" aria-label="Instagram de AATEGRE Centro Diurno (se abre en una pestaña nueva)">
+        <i class="bi bi-instagram"></i> Instagram
+    </a>
+}
+@if (string.IsNullOrWhiteSpace(Model?.Facebook) && string.IsNullOrWhiteSpace(Model?.Instagram))
+{
+    <span class="footer-rrss-vacio">Redes sociales próximamente</span>
+}

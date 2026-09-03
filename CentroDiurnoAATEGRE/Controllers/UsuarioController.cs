@@ -120,6 +120,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         [HttpPost, Authorize, ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(int id, UsuarioDTO dto)
         {
+            dto.IdUsuario = id;
             ModelState.Remove(nameof(dto.Contrasena));
             if (!ModelState.IsValid) { await CargarSelectsAsync(); return View("Formulario", dto); }
 
