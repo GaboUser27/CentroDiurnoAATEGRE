@@ -14,9 +14,12 @@
                    style="border-color:rgba(255,255,255,0.5);color:white;">
                     <i class="bi bi-arrow-left"></i>Panel
                 </a>
-                <a asp-action="Crear" class="btn-primario" style="background:white;color:var(--azul);">
-                    <i class="bi bi-person-plus-fill"></i>Nuevo Usuario
-                </a>
+                @if (User.IsInRole("Administrador"))
+                {
+                    <a asp-action="Crear" class="btn-primario" style="background:white;color:var(--azul);">
+                        <i class="bi bi-person-plus-fill"></i>Nuevo Usuario
+                    </a>
+                }
             </div>
         </div>
     </div>
@@ -76,16 +79,23 @@
                                     }
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <a asp-action="Editar" asp-route-id="@usuario.IdUsuario"
-                                           class="btn btn-sm btn-outline-primary rounded-2" title="Editar">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a asp-action="CambiarEstado" asp-route-id="@usuario.IdUsuario"
-                                           class="btn btn-sm @(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "btn-outline-warning" : "btn-outline-success") rounded-2">
-                                            <i class="bi bi-toggle-@(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "on" : "off")"></i>
-                                        </a>
-                                    </div>
+                                    @if (User.IsInRole("Administrador"))
+                                    {
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <a asp-action="Editar" asp-route-id="@usuario.IdUsuario"
+                                               class="btn btn-sm btn-outline-primary rounded-2" title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="CambiarEstado" asp-route-id="@usuario.IdUsuario"
+                                               class="btn btn-sm @(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "btn-outline-warning" : "btn-outline-success") rounded-2">
+                                                <i class="bi bi-toggle-@(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "on" : "off")"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted small">—</span>
+                                    }
                                 </td>
                             </tr>
                         }

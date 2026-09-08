@@ -107,7 +107,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet, Authorize]
+        [HttpGet, Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Editar(int id)
         {
             var dto = await _usuarioService.ObtenerPorIdAsync(id);
@@ -117,7 +117,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return View("Formulario", dto);
         }
 
-        [HttpPost, Authorize, ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Roles = "Administrador"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(int id, UsuarioDTO dto)
         {
             dto.IdUsuario = id;
