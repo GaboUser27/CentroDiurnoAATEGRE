@@ -33,6 +33,11 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    /* Varias formas decorativas (círculos, badges flotantes) usan
+       position:absolute con desplazamientos negativos. Esto evita que
+       generen una barra de scroll horizontal fantasma en móvil si algún
+       contenedor no las recorta correctamente. */
+    overflow-x: hidden;
 }
 
 body {
@@ -40,6 +45,11 @@ body {
     color: var(--texto);
     background: var(--blanco);
     line-height: 1.7;
+    overflow-x: hidden;
+    /* Red de seguridad: URLs o correos largos sin espacios (p.ej. en
+       "Información Institucional") no tienen dónde partirse y podían
+       desbordar su columna en pantallas angostas. */
+    overflow-wrap: break-word;
 }
 
 h1, h2, h3, h4 {
@@ -131,6 +141,38 @@ img {
         background: var(--azul);
         color: var(--blanco);
         transform: translateY(-2px);
+    }
+
+/* ── Encabezado interno de página (Quiénes Somos, Avisos, Contacto) ──
+   Antes estaba repetido como "style=" en cada vista, sin ningún ajuste
+   para móvil (el mismo padding grande de escritorio se aplicaba siempre). */
+.pagina-hero-secundario {
+    background: linear-gradient(135deg, var(--azul-oscuro), var(--azul));
+    padding: 5rem 0 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+    .pagina-hero-secundario .pagina-hero-curva {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: var(--blanco);
+        clip-path: ellipse(55% 100% at 50% 100%);
+    }
+
+    .pagina-hero-secundario h1 {
+        font-family: 'Playfair Display', serif;
+        color: var(--blanco);
+        font-size: clamp(1.7rem, 4vw, 2.8rem);
+    }
+
+    .pagina-hero-secundario p {
+        color: rgba(255,255,255,.75);
+        max-width: 520px;
+        margin: .75rem auto 0;
     }
 
 /* ── NAVBAR ── */
@@ -526,6 +568,11 @@ img {
     font-size: 7rem;
     position: relative;
     overflow: hidden;
+    /* Esta clase nació para una caja-placeholder, pero también se usa
+       directamente sobre <img> reales (Inicio y Quiénes Somos). Sin
+       object-fit, la foto se deformaba para encajar en el aspect-ratio
+       4/5 en vez de recortarse proporcionalmente. */
+    object-fit: cover;
 }
 
     .quienes-imagen-bg::before {
@@ -917,6 +964,17 @@ img {
             background: #E1306C;
             color: var(--blanco);
         }
+
+.seccion-contacto-detalle {
+    padding: 5rem 0;
+    background: var(--blanco);
+}
+
+.mapa-contacto-wrap {
+    height: 420px;
+    border-radius: 1.5rem;
+    overflow: hidden;
+}
 
 /* ── FOOTER ── */
 .footer-aategre {
@@ -1953,6 +2011,36 @@ img {
     .quienes-badge-flotante {
         right: 0;
     }
+
+    /* Todas las secciones internas usaban el mismo padding vertical
+       grande de escritorio (5–6rem) también en tablet/móvil, lo que
+       hacía la página excesivamente larga para navegar con el pulgar. */
+    .seccion-quienes,
+    .seccion-servicios,
+    .seccion-galeria,
+    .seccion-contacto,
+    .seccion-contacto-detalle,
+    .seccion-avisos {
+        padding: 3.5rem 0;
+    }
+
+    .pagina-hero-secundario {
+        padding: 3.5rem 0 3rem;
+    }
+
+    .galeria-hero-header {
+        padding: 3.5rem 1rem 4rem;
+    }
+
+    .categoria-banner-activa {
+        padding: 1.1rem 1.25rem;
+    }
+
+    /* En pantallas medianas el mapa de 420px de alto empuja demasiado
+       el resto del contenido hacia abajo. */
+    .mapa-contacto-wrap {
+        height: 320px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -1990,6 +2078,99 @@ img {
 
     .login-card {
         padding: 2rem 1.5rem;
+    }
+
+    .panel-header {
+        padding: 1.75rem 0;
+        text-align: center;
+    }
+
+        .panel-header .d-flex.justify-content-between {
+            justify-content: center !important;
+            text-align: center;
+        }
+
+        .panel-header h1 {
+            font-size: 1.4rem;
+        }
+
+    /* ── Encabezado con botón "volver" + insignia + título anidados
+       (solo en Agregar/Editar Imagen): al centrar el texto del bloque
+       completo, la insignia y el título quedaban centrados dentro de
+       su propia caja mientras el botón de volver se quedaba pegado a
+       la izquierda, dando una lectura descuadrada. Se mantiene el
+       texto alineado a la izquierda, junto al botón. ── */
+    .panel-header-texto {
+        text-align: left;
+    }
+
+    /* ── Botones "Cancelar / Guardar" de los formularios administrativos:
+       antes quedaban en fila y podían apretarse o desbordar en teléfonos
+       angostos (320–360px). Se apilan a ancho completo, con la acción
+       principal arriba para que quede más a mano. ── */
+    .form-admin-acciones,
+    .form-card-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+        .form-admin-acciones .btn-primario,
+        .form-admin-acciones .btn-secundario,
+        .form-card-footer .btn-form-guardar,
+        .form-card-footer .btn-form-cancelar {
+            width: 100%;
+            justify-content: center;
+        }
+
+    .form-card-aategre {
+        padding: 1.5rem;
+    }
+
+    .dropzone-aategre {
+        padding: 1.75rem 1rem;
+    }
+
+    /* ── Tarjeta flotante del hero: en teléfono el padding de escritorio
+       (2.5rem) dejaba muy poco ancho útil para las 4 estadísticas. ── */
+    .hero-card-flotante {
+        max-width: 100%;
+        padding: 1.75rem 1.5rem;
+    }
+
+    .hero-icono-grande {
+        width: 70px;
+        height: 70px;
+        font-size: 1.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .hero-stats {
+        gap: 0.6rem;
+    }
+
+    .hero-stat {
+        padding: 0.6rem 0.4rem;
+    }
+
+    .hero-stat-num {
+        font-size: 1.35rem;
+    }
+
+    /* ── Badge flotante de "Quiénes Somos": estaba desplazado con
+       right:-1.5rem, sobresaliendo del contenedor de la imagen y
+       generando riesgo de scroll horizontal en teléfono. ── */
+    .quienes-badge-flotante {
+        position: static;
+        margin: -2rem auto 0;
+        width: fit-content;
+        right: auto;
+        bottom: auto;
+    }
+
+    /* ── Mapa de contacto: 420px de alto es casi toda la pantalla de
+       un teléfono; se reduce para dejar ver el resto de la página. ── */
+    .mapa-contacto-wrap {
+        height: 240px;
     }
 }
 
@@ -2301,4 +2482,25 @@ img {
 /* Modal Lightbox */
 .modal-galeria-aategre .modal-content {
     background: #0f172a;
+}
+
+/* ── Dispositivos táctiles: los overlays de la galería (título, fecha,
+   lupa) solo se mostraban en :hover, un estado que no existe al tocar
+   la pantalla. En un teléfono esas fotos se veían "vacías" o el texto
+   nunca aparecía. Aquí se muestran siempre para cualquier dispositivo
+   sin hover real (teléfonos y tablets), sin importar el tamaño de
+   pantalla. Esta regla se coloca al final del archivo a propósito:
+   ".galeria-card-overlay" se redefine más arriba (sección de galería
+   pública) y, al tener la misma especificidad, gana la que aparece
+   último en el archivo. ── */
+@media (hover: none) {
+    .galeria-overlay,
+    .galeria-card-overlay {
+        opacity: 1;
+        background: linear-gradient(to top, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.15) 65%, transparent 100%);
+    }
+
+    .galeria-card-publica:active .galeria-card-img {
+        transform: scale(1.04);
+    }
 }

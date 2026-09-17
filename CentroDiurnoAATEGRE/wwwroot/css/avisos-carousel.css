@@ -336,3 +336,24 @@
         height: 42px;
     }
 }
+
+/* ── Teléfonos angostos (<420px): el ícono a la izquierda y las
+   fechas a la derecha, en la misma fila, quedaban apretados y a
+   veces se encimaban. Se apilan verticalmente para dejar respirar
+   el contenido. ── */
+@media (max-width: 420px) {
+    .carrusel-panel {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+    }
+
+    .carrusel-panel-fechas {
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .carrusel-contenido {
+        padding: 1.5rem 1.25rem 2rem;
+    }
+}
