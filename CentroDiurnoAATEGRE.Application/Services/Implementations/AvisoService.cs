@@ -51,12 +51,20 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
         {
             var aviso = await _repo.ObtenerPorIdAsync(id)
                 ?? throw new KeyNotFoundException($"Aviso {id} no encontrado.");
-            dto.IdAviso = id; 
+            dto.IdAviso = id;
             _mapper.Map(dto, aviso);
             await _repo.ActualizarAsync(aviso);
         }
 
         public async Task EliminarAsync(int id) =>
             await _repo.EliminarAsync(id);
+
+        public async Task<int> ContarActivosAsync() =>
+            await _repo.ContarActivosAsync();
+
+        // Misma referencia de tiempo que usa ObtenerVigentesAsync, para que la
+        // vista publica y el estado guardado en base de datos no se contradigan.
+        public async Task<int> DesactivarVencidosAsync() =>
+            await _repo.DesactivarVencidosAsync(DateTime.Now);
     }
 }

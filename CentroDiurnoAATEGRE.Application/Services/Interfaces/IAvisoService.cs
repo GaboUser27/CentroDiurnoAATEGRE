@@ -15,5 +15,12 @@ namespace CentroDiurnoAATEGRE.Application.Services.Interfaces
         Task CrearAsync(AvisoDTO dto);
         Task EditarAsync(int id, AvisoDTO dto);
         Task EliminarAsync(int id);
+
+        /// Cantidad de avisos actualmente marcados como activos.
+        Task<int> ContarActivosAsync();
+
+        /// Inactiva los avisos cuya fecha de expiracion ya paso.
+        /// Devuelve cuantos avisos se inactivaron.
+        Task<int> DesactivarVencidosAsync();
     }
 }

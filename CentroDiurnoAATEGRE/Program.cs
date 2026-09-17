@@ -5,6 +5,7 @@ using CentroDiurnoAATEGRE.Application.Services.Interfaces;
 using CentroDiurnoAATEGRE.Infraestructure.Data;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations;
 using CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces;
+using CentroDiurnoAATEGRE.Web.BackgroundServices;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +30,9 @@ builder.Services.AddScoped<IInformacionInstitucionalService, InformacionInstituc
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IImagenService, ImagenService>();
 builder.Services.AddScoped<ICategoriaImagenService, CategoriaImagenService>();
+
+// Tarea programada: inactiva los avisos vencidos (al arrancar y cada hora).
+builder.Services.AddHostedService<AvisosVencidosService>();
 
 //Automapper
 builder.Services.AddAutoMapper(config =>

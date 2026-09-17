@@ -11,5 +11,9 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces
     {
         Task<IEnumerable<Aviso>> ObtenerActivosAsync();
         Task<IEnumerable<Aviso>> ObtenerVigentesAsync(); // activos y no expirados
+
+        ///Cantidad de avisos marcados como activos.
+        Task<int> ContarActivosAsync();
+        Task<int> DesactivarVencidosAsync(DateTime referencia);
     }
 }

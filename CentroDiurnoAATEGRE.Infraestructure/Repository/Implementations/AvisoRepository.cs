@@ -26,5 +26,17 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations
                             (a.FechaExpiracion == null || a.FechaExpiracion >= DateTime.Now))
                 .OrderByDescending(a => a.FechaPublicacion)
                 .ToListAsync();
+
+        public async Task<int> ContarActivosAsync() =>
+            await _context.Aviso.CountAsync(a => a.Activo);
+
+        // ExecuteUpdateAsync (EF Core 7+) genera un unico UPDATE ... WHERE en el
+        // servidor: no trae las entidades a memoria ni necesita SaveChanges.
+        public async Task<int> DesactivarVencidosAsync(DateTime referencia) =>
+            await _context.Aviso
+                .Where(a => a.Activo &&
+                            a.FechaExpiracion != null &&
+                            a.FechaExpiracion < referencia)
+                .ExecuteUpdateAsync(s => s.SetProperty(a => a.Activo, false));
     }
 }
