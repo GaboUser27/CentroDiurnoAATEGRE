@@ -101,6 +101,20 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return View();
         }
 
+        public int ObtenerTotalAvisosActivos()
+        {
+            int total = 0;
+            var avisosActivos = _avisoService.ObtenerVigentesAsync();
+            if (avisosActivos != null)
+            {
+                foreach (var aviso in avisosActivos.Result)
+                {
+                    total++;
+                }
+            }
+            return total;
+        }
+
         // GET: /Home/Dashboard
         [Authorize]
         public async Task<IActionResult> Dashboard()
@@ -110,7 +124,9 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             var cats = await _categoriaService.ObtenerTodosAsync();
             var usuarios = await _usuarioService.ObtenerTodosAsync();
 
-            ViewBag.TotalAvisos = avisos.Count();
+            // Solo los avisos marcados como activos: la tarjeta se llama
+            // "Avisos activos" pero antes contaba el total de la tabla.
+            ViewBag.TotalAvisos = ObtenerTotalAvisosActivos();
             ViewBag.TotalImagenes = imagenes.Count();
             ViewBag.TotalCategorias = cats.Count();
             ViewBag.TotalUsuarios = usuarios.Count();

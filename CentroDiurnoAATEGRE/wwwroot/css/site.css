@@ -148,7 +148,10 @@ img {
    para móvil (el mismo padding grande de escritorio se aplicaba siempre). */
 .pagina-hero-secundario {
     background: linear-gradient(135deg, var(--azul-oscuro), var(--azul));
-    padding: 5rem 0 4rem;
+    /* El padding inferior debe ser mayor que la altura de .pagina-hero-curva
+       (60px) mas un margen de seguridad; de lo contrario el subtitulo blanco
+       cae justo sobre la curva blanca y deja de leerse. */
+    padding: 5rem 0 7rem;
     position: relative;
     overflow: hidden;
 }
@@ -170,9 +173,19 @@ img {
     }
 
     .pagina-hero-secundario p {
-        color: rgba(255,255,255,.75);
+        color: rgba(255,255,255,.88);
         max-width: 520px;
         margin: .75rem auto 0;
+    }
+
+    /* El contenido siempre por encima de la curva decorativa. */
+    .pagina-hero-secundario .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .pagina-hero-secundario .pagina-hero-curva {
+        z-index: 1;
     }
 
 /* ── NAVBAR ── */
@@ -2025,7 +2038,7 @@ img {
     }
 
     .pagina-hero-secundario {
-        padding: 3.5rem 0 3rem;
+        padding: 3.5rem 0 5.5rem;
     }
 
     .galeria-hero-header {
