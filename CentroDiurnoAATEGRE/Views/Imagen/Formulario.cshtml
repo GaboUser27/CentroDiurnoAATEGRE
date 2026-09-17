@@ -12,7 +12,7 @@
                 <a asp-action="Index" class="btn-panel-secundario" title="Volver al listado">
                     <i class="bi bi-arrow-left"></i>
                 </a>
-                <div>
+                <div class="panel-header-texto">
                     <span class="badge-panel mb-2"><i class="bi bi-images me-1"></i>Galería Institucional</span>
                     <h1 class="mb-0">
                         <i class="bi bi-@(esEdicion ? "pencil-square" : "cloud-arrow-up-fill") me-2"></i>@ViewData["Title"]
@@ -32,8 +32,8 @@
                         <i class="bi bi-card-image text-primary me-2"></i>Información de la Carga
                     </h4>
                     <p class="form-card-sub">
-                        @(esEdicion 
-                            ? "Modifique los datos o reemplace la imagen actual." 
+                        @(esEdicion
+                            ? "Modifique los datos o reemplace la imagen actual."
                             : "Seleccione una o varias fotografías y asócielas a una categoría de actividades.")
                     </p>
                 </div>
@@ -84,7 +84,7 @@
                             </p>
                             <input type="file" id="archivos" name="archivos" class="d-none"
                                    accept="image/jpeg,image/png,image/webp,image/gif"
-                                   @(esEdicion ? "" : "multiple required") />
+                            @(esEdicion ? "" : "multiple required") />
                         </div>
                         <span asp-validation-for="Imagen1" class="text-danger small mt-1 d-block"></span>
 
