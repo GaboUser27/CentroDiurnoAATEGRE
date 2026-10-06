@@ -174,7 +174,13 @@
         </div>
         <div class="footer-bottom">
             <div class="container">
-                <p class="mb-0">&copy; @DateTime.Now.Year AATEGRE Centro Diurno — Todos los derechos reservados.</p>
+                <p class="mb-0">
+                    &copy; @DateTime.Now.Year AATEGRE Centro Diurno — Todos los derechos reservados.
+                    <span class="footer-bottom-sep" aria-hidden="true">|</span>
+                    <a class="footer-legal" asp-controller="Home" asp-action="Terminos">
+                        <i class="bi bi-file-earmark-text" aria-hidden="true"></i>Términos y condiciones
+                    </a>
+                </p>
             </div>
         </div>
     </footer>
@@ -185,21 +191,21 @@
     <!-- Datos estructurados (Schema.org) para que Google entienda de qué
          trata el sitio y pueda mostrarlo mejor en los resultados de búsqueda. -->
     <script type="application/ld+json">
-        {
-            "@@context": "https://schema.org",
-            "@@type": "NursingHome",
-            "name": "AATEGRE Centro Diurno",
-            "description": "Centro diurno de cuidado integral para adultos mayores en Grecia, Alajuela, Costa Rica.",
-            "url": "@metaUrlBase",
-            "logo": "@metaImagen",
-            "image": "@metaImagen",
-            "address": {
-                "@@type": "PostalAddress",
-                "addressLocality": "Grecia",
-                "addressRegion": "Alajuela",
-                "addressCountry": "CR"
+            {
+                "@@context": "https://schema.org",
+                "@@type": "NursingHome",
+                "name": "AATEGRE Centro Diurno",
+                "description": "Centro diurno de cuidado integral para adultos mayores en Grecia, Alajuela, Costa Rica.",
+                "url": "@metaUrlBase",
+                "logo": "@metaImagen",
+                "image": "@metaImagen",
+                "address": {
+                    "@@type": "PostalAddress",
+                    "addressLocality": "Grecia",
+                    "addressRegion": "Alajuela",
+                    "addressCountry": "CR"
+                }
             }
-        }
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

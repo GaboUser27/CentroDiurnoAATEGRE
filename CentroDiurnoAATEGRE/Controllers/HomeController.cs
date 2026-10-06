@@ -90,6 +90,14 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return View();
         }
 
+        // GET: /Home/Terminos  -> Terminos y condiciones de uso del sitio
+        [AllowAnonymous]
+        public IActionResult Terminos()
+        {
+            ViewData["ActivePage"] = "Terminos";
+            return View();
+        }
+
         // GET: /Home/AccesoDenegado
         // A donde redirige el sistema de autenticación cuando un usuario
         // autenticado (ej. un Colaborador) intenta entrar a una acción
