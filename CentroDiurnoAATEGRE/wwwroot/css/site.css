@@ -275,35 +275,29 @@ img {
 .hero {
     min-height: 92vh;
     background: url('../images/PI3.jpeg');
-    background-size: cover; /* Hace que cubra todo el contenedor */
-    background-position: center; /* Centra la imagen */
+    background-size: cover;
+    background-position: center;
     background-repeat: no-repeat;
     position: relative;
     display: flex;
     align-items: center;
     overflow: hidden;
+    padding: 4rem 0 6rem; /* Añadido padding para que el contenido no quede pegado arriba/abajo */
 }
 
 .hero-panel {
-    /* Antes: rgba(18,22,28,0.62). Bajamos a 0.42 para dejar ver
-       la fotografía de fondo sin perder legibilidad del texto blanco
-       (el blur + la propia oscuridad de la imagen sostienen el AA). */
-    background: rgba(18, 22, 28, 0.42);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    /* Radio más contenido: antes 32px, que sumado al padding hacía
-       que el panel pareciera una tarjeta flotante gigante. */
-    border-radius: 22px;
-    /* Padding reducido ~30% para que el panel no domine la imagen. */
-    padding: 2rem 2.5rem;
+    background: rgba(18, 22, 28, 0.45); /* Mejoramos contraste sutilmente */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px; /* Bordes ligeramente más suaves */
+    padding: 2rem 2.25rem; /* Reducimos el relleno interno (~15% menos) */
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
     position: relative;
     z-index: 2;
     width: 100%;
-    max-width: 80%; /* ← la clave */
+    max-width: 1200px; /* Evita que crezca sin control en pantallas muy grandes */
     margin: 0 auto;
-    
 }
 
 /* Navegadores sin backdrop-filter: seguimos necesitando un fondo
@@ -318,12 +312,13 @@ img {
 .hero::before {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: -1px;
     left: 0;
     right: 0;
-    height: 120px;
+    height: 80px; /* Bajada de 120px a 80px */
     background: var(--blanco);
     clip-path: ellipse(55% 100% at 50% 100%);
+    z-index: 1; /* Aseguramos que quede por debajo */
 }
 
 .hero-formas {
@@ -2049,7 +2044,7 @@ img {
 
     .hero {
         min-height: auto;
-        padding: 6rem 0 7rem;
+        padding: 4.5rem 0 5.5rem; /* Ajustamos paddings de la sección */
     }
 
     .hero-card-flotante {
@@ -2057,8 +2052,20 @@ img {
     }
 
     .hero-panel {
-        padding: 1.75rem 1.5rem; 
-        border-radius: 20px; 
+        padding: 1.75rem 1.5rem;
+        max-width: 95%; /* Mayor aprovechamiento del ancho en tablets */
+    }
+    .hero::before {
+        height: 60px; /* Curva más sutil en pantallas medianas */
+    }
+    .hero-titulo {
+        font-size: clamp(2rem, 4.5vw, 2.8rem);
+        margin-bottom: 1rem;
+    }
+
+    .hero-descripcion {
+        font-size: 1.05rem;
+        margin-bottom: 1.75rem;
     }
 
     .galeria-grid {
@@ -2132,10 +2139,25 @@ img {
 
     .hero-botones {
         flex-direction: column;
+        gap: 0.75rem;
+        width: 100%;
     }
 
-    .btn-primario, .btn-secundario {
-        justify-content: center;
+    .hero-titulo {
+        font-size: 1.8rem; /* Tamaño seguro y legible sin desbordamientos */
+        line-height: 1.2;
+    }
+
+    .hero-descripcion {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primario,
+    .btn-secundario {
+        width: 100%;
+        justify-content: center; /* Centramos el texto e íconos */
+        padding: 0.7rem 1.2rem;
     }
 
     .login-card {
@@ -2194,33 +2216,50 @@ img {
 
     /* ── Tarjeta flotante del hero: en teléfono el padding de escritorio
        (2.5rem) dejaba muy poco ancho útil para las 4 estadísticas. ── */
+    .hero {
+        padding: 3rem 0 4.5rem; /* Desplazamiento más ajustado en móvil */
+    }
+
+        .hero::before {
+            height: 40px; /* Muy pequeña en teléfonos para dar el máximo espacio posible */
+        }
+
     .hero-panel {
-        padding: 1.4rem 1.1rem;
-        border-radius: 18px; 
+        padding: 1.25rem 1rem; /* Padding ultra-compacto para que no apriete los textos */
+        border-radius: 16px;
+        max-width: 100%;
+        margin: 0 0.5rem; /* Evitamos que toque los bordes del dispositivo */
     }
 
     .hero-card-flotante {
-        max-width: 100%;
-        padding: 1.75rem 1.5rem;
+        margin-top: 2rem; /* Separa de la columna de arriba cuando se apila */
+        max-width: 100%; /* Utiliza el 100% de la columna */
+        padding: 1.5rem 1rem;
     }
 
     .hero-icono-grande {
-        width: 70px;
-        height: 70px;
-        font-size: 1.9rem;
-        margin-bottom: 1rem;
+        width: 64px;
+        height: 64px;
+        font-size: 1.8rem;
+        margin-bottom: 0.85rem;
     }
 
     .hero-stats {
-        gap: 0.6rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem; /* Margen muy pequeño para que todo quepa sin desbordar */
+        margin-top: 1.25rem;
     }
 
     .hero-stat {
-        padding: 0.6rem 0.4rem;
+        padding: 0.5rem 0.25rem;
     }
 
     .hero-stat-num {
-        font-size: 1.35rem;
+        font-size: 1.3rem; /* Números un poco más pequeños */
+    }
+
+    .hero-stat-label {
+        font-size: 0.75rem; /* Texto pequeño y legible para móvil */
     }
 
     /* ── Badge flotante de "Quiénes Somos": estaba desplazado con
