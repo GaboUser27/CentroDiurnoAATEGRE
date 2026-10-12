@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace CentroDiurnoAATEGRE.Web.Controllers
@@ -38,7 +39,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return View();
         }
 
-        [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
+        [HttpPost, AllowAnonymous, ValidateAntiForgeryToken, EnableRateLimiting("login")]
         public async Task<IActionResult> Login(UsuarioDTO dto)
         {
             // El formulario de login solo envía Correo y Contraseña.
@@ -48,8 +49,13 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             ModelState.Remove(nameof(dto.Nombre));
             ModelState.Remove(nameof(dto.IdRol));
             ModelState.Remove(nameof(dto.IdEstadoUsuario));
+            ModelState.Remove(nameof(dto.Contrasena));
 
-            if (!ModelState.IsValid) return View(dto);
+            if (string.IsNullOrWhiteSpace(dto.Correo) || string.IsNullOrEmpty(dto.Contrasena) || !ModelState.IsValid)
+            {
+                ViewBag.Error = "Correo o contraseña incorrectos, o cuenta inactiva.";
+                return View(dto);
+            }
 
             var usuario = await _usuarioService.ValidarLoginAsync(dto.Correo, dto.Contrasena ?? string.Empty);
 
@@ -74,7 +80,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction("Dashboard", "Home");
         }
 
-        [HttpGet, Authorize]
+        [HttpPost, Authorize, ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync("CookieAuth");
@@ -83,7 +89,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
 
         // ── CRUD ───────────────────────────────────────────────────────
 
-        [HttpGet, Authorize]
+        [HttpGet, Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Index()
         {
             var dtos = await _usuarioService.ObtenerTodosAsync();
@@ -100,6 +106,8 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         [HttpPost, Authorize(Roles = "Administrador"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Crear(UsuarioDTO dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Contrasena))
+                ModelState.AddModelError(nameof(dto.Contrasena), "La contraseña es requerida.");
             if (!ModelState.IsValid) { await CargarSelectsAsync(); return View("Formulario", dto); }
 
             await _usuarioService.CrearAsync(dto);
@@ -121,7 +129,32 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         public async Task<IActionResult> Editar(int id, UsuarioDTO dto)
         {
             dto.IdUsuario = id;
+            var usuarioActual = await _usuarioService.ObtenerPorIdAsync(id);
+            if (usuarioActual == null) return NotFound();
+
+            var esAutogestion = id.ToString() == User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (esAutogestion && (dto.IdRol != usuarioActual.IdRol || dto.IdEstadoUsuario != usuarioActual.IdEstadoUsuario))
+            {
+                ModelState.AddModelError(string.Empty, "No puede cambiar su propio rol ni el estado de su cuenta.");
+            }
+
+            var roles = await _rolRepo.ObtenerTodosAsync();
+            var nombreNuevoRol = roles.FirstOrDefault(r => r.IdRol == dto.IdRol)?.Nombre;
+            var pierdeUltimoAdminActivo = usuarioActual.IdRolNavigation?.Nombre == "Administrador"
+                && usuarioActual.IdEstadoUsuarioNavigation?.Nombre == "Activo"
+                && (nombreNuevoRol != "Administrador" || dto.IdEstadoUsuario != usuarioActual.IdEstadoUsuario);
+            if (pierdeUltimoAdminActivo)
+            {
+                var usuarios = await _usuarioService.ObtenerTodosAsync();
+                var adminsActivos = usuarios.Count(u => u.IdRolNavigation?.Nombre == "Administrador"
+                    && u.IdEstadoUsuarioNavigation?.Nombre == "Activo");
+                if (adminsActivos <= 1)
+                    ModelState.AddModelError(string.Empty, "Debe existir al menos un administrador activo.");
+            }
+
             ModelState.Remove(nameof(dto.Contrasena));
+            if (!string.IsNullOrWhiteSpace(dto.Contrasena) && dto.Contrasena.Length < 12)
+                ModelState.AddModelError(nameof(dto.Contrasena), "Use al menos 12 caracteres.");
             if (!ModelState.IsValid) { await CargarSelectsAsync(); return View("Formulario", dto); }
 
             await _usuarioService.EditarAsync(id, dto);
@@ -129,9 +162,27 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet, Authorize(Roles = "Administrador")]
+        [HttpPost, Authorize(Roles = "Administrador"), ValidateAntiForgeryToken]
         public async Task<IActionResult> CambiarEstado(int id)
         {
+            var usuario = await _usuarioService.ObtenerPorIdAsync(id);
+            if (usuario == null) return NotFound();
+            if (id.ToString() == User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                TempData["Error"] = "No puede cambiar el estado de su propia cuenta.";
+                return RedirectToAction(nameof(Index));
+            }
+            if (usuario.IdRolNavigation?.Nombre == "Administrador"
+                && usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo")
+            {
+                var usuarios = await _usuarioService.ObtenerTodosAsync();
+                if (usuarios.Count(u => u.IdRolNavigation?.Nombre == "Administrador"
+                    && u.IdEstadoUsuarioNavigation?.Nombre == "Activo") <= 1)
+                {
+                    TempData["Error"] = "Debe existir al menos un administrador activo.";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
             await _usuarioService.CambiarEstadoAsync(id);
             TempData["Exito"] = "Estado del usuario actualizado.";
             return RedirectToAction(nameof(Index));

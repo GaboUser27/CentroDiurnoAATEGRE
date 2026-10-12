@@ -13,6 +13,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Interfaces
         Task<IEnumerable<ImagenDTO>> ObtenerConCategoriaAsync();
         Task<IEnumerable<ImagenDTO>> ObtenerPorCategoriaAsync(int idCategoria);
         Task<ImagenDTO?> ObtenerPorIdAsync(int id);
+        Task<byte[]?> ObtenerBytesImagenAsync(int id);
         Task CrearAsync(ImagenDTO dto, byte[]? imagenBytes);
         Task EditarAsync(int id, ImagenDTO dto, byte[]? imagenBytes);
         Task EliminarAsync(int id);

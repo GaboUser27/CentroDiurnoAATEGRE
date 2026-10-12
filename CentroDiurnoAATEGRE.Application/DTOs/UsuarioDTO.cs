@@ -24,7 +24,7 @@ namespace CentroDiurnoAATEGRE.Application.DTOs
         public string Correo { get; set; } = string.Empty;
 
         [Display(Name = "Contraseña")]
-        [MinLength(6, ErrorMessage = "Mínimo 6 caracteres.")]
+        [MinLength(12, ErrorMessage = "Use al menos 12 caracteres.")]
         public string? Contrasena { get; set; } = string.Empty;
 
         public int IdRol { get; set; }

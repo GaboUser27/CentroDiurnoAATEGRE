@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Reemplazar "https://www.aategre.cr" por el dominio real una vez
-  esté en producción. <changefreq> y <priority> son solo sugerencias
-  para el buscador, no una garantía de comportamiento.
--->
+
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://www.aategre.cr/</loc>

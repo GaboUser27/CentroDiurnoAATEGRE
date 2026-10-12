@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CentroDiurnoAATEGRE.Application.Validation;
 
 namespace CentroDiurnoAATEGRE.Application.DTOs
 {
@@ -33,11 +34,21 @@ namespace CentroDiurnoAATEGRE.Application.DTOs
         public string? Direccion { get; set; }
 
         [MaxLength(255)]
+        [HttpsUrl(ErrorMessage = "La dirección de Facebook debe comenzar con https://")]
         [Display(Name = "Facebook")]
         public string? Facebook { get; set; }
 
         [MaxLength(255)]
+        [HttpsUrl(ErrorMessage = "La dirección de Instagram debe comenzar con https://")]
         [Display(Name = "Instagram")]
         public string? Instagram { get; set; }
+
+        public string? FacebookUrlSegura => EsHttps(Facebook) ? Facebook : null;
+        public string? InstagramUrlSegura => EsHttps(Instagram) ? Instagram : null;
+
+        private static bool EsHttps(string? value) =>
+            Uri.TryCreate(value, UriKind.Absolute, out var uri)
+            && uri.Scheme == Uri.UriSchemeHttps
+            && !string.IsNullOrWhiteSpace(uri.Host);
     }
 }

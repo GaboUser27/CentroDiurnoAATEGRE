@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CentroDiurnoAATEGRE.Web.Controllers
 {
+    [Authorize(Roles = "Administrador,Colaborador,Empleado")]
     public class ImagenController : Controller
     {
         private readonly IImagenService _imagenService;
@@ -49,23 +50,48 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return View(dtos);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
+        public async Task<IActionResult> Ver(int id)
+        {
+            if (id <= 0) return NotFound();
+            var bytes = await _imagenService.ObtenerBytesImagenAsync(id);
+            if (bytes is not { Length: > 0 }) return NotFound();
+
+            var etag = $"\"{Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes))}\"";
+            Response.Headers.ETag = etag;
+            Response.Headers.CacheControl = "public,max-age=3600,must-revalidate";
+            if (Request.Headers.IfNoneMatch.Any(value => value == etag))
+                return StatusCode(StatusCodes.Status304NotModified);
+
+            var mimeType = bytes.Length >= 12
+                && System.Text.Encoding.ASCII.GetString(bytes, 0, 4) == "RIFF"
+                && System.Text.Encoding.ASCII.GetString(bytes, 8, 4) == "WEBP" ? "image/webp"
+                : bytes.Length >= 8 && bytes[0] == 0x89 && bytes[1] == 0x50 ? "image/png"
+                : bytes.Length >= 6 && System.Text.Encoding.ASCII.GetString(bytes, 0, 3) == "GIF" ? "image/gif"
+                : "image/jpeg";
+
+            return File(bytes, mimeType);
+        }
+
         // ── ADMIN ──────────────────────────────────────────────────────
 
-        [HttpGet, Authorize]
+        [HttpGet, Authorize(Roles = "Administrador,Colaborador,Empleado")]
         public async Task<IActionResult> Index()
         {
             var dtos = await _imagenService.ObtenerConCategoriaAsync();
             return View(dtos);
         }
 
-        [HttpGet, Authorize]
+        [HttpGet, Authorize(Roles = "Administrador,Colaborador,Empleado")]
         public async Task<IActionResult> Crear()
         {
             await CargarCategoriasAsync();
             return View("Formulario", new ImagenDTO { FechaImagen = DateTime.Now });
         }
 
-        [HttpPost, Authorize, ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Roles = "Administrador,Colaborador,Empleado"), ValidateAntiForgeryToken, RequestSizeLimit(27_000_000), RequestFormLimits(MultipartBodyLengthLimit = 27_000_000)]
         public async Task<IActionResult> Crear(ImagenDTO dto, List<IFormFile>? archivos, IFormFile? archivo)
         {
             var listaArchivos = new List<IFormFile>();
@@ -81,6 +107,14 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             if (listaArchivos.Count == 0)
             {
                 ModelState.AddModelError("archivos", "Debe seleccionar al menos una imagen.");
+                await CargarCategoriasAsync();
+                return View("Formulario", dto);
+            }
+
+            if (listaArchivos.Count > 10 || listaArchivos.Any(f => f.Length > 5_000_000)
+                || listaArchivos.Sum(f => f.Length) > 25_000_000)
+            {
+                ModelState.AddModelError("archivos", "Puede subir hasta 10 imágenes, con un máximo de 5 MB cada una y 25 MB en total.");
                 await CargarCategoriasAsync();
                 return View("Formulario", dto);
             }
@@ -128,7 +162,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet, Authorize]
+        [HttpGet, Authorize(Roles = "Administrador,Colaborador,Empleado")]
         public async Task<IActionResult> Editar(int id)
         {
             var dto = await _imagenService.ObtenerPorIdAsync(id);
@@ -138,7 +172,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return View("Formulario", dto);
         }
 
-        [HttpPost, Authorize, ValidateAntiForgeryToken]
+        [HttpPost, Authorize(Roles = "Administrador,Colaborador,Empleado"), ValidateAntiForgeryToken, RequestSizeLimit(6_000_000), RequestFormLimits(MultipartBodyLengthLimit = 6_000_000)]
         public async Task<IActionResult> Editar(int id, ImagenDTO dto, List<IFormFile>? archivos, IFormFile? archivo)
         {
             var archivoSubido = (archivos != null && archivos.Count > 0)
@@ -164,7 +198,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet, Authorize]
+        [HttpPost, Authorize(Roles = "Administrador,Colaborador,Empleado"), ValidateAntiForgeryToken]
         public async Task<IActionResult> Eliminar(int id)
         {
             await _imagenService.EliminarAsync(id);
@@ -182,9 +216,21 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
 
         private static bool EsImagenValida(IFormFile archivo)
         {
+            if (archivo.Length is 0 or > 5_000_000) return false;
             var extensiones = new[] { ".jpg", ".jpeg", ".png", ".webp", ".gif" };
             var ext = Path.GetExtension(archivo.FileName).ToLowerInvariant();
-            return extensiones.Contains(ext);
+            if (!extensiones.Contains(ext)) return false;
+            Span<byte> signature = stackalloc byte[12];
+            using var stream = archivo.OpenReadStream();
+            var read = stream.Read(signature);
+            return ext switch
+            {
+                ".jpg" or ".jpeg" => read >= 3 && signature[0] == 0xFF && signature[1] == 0xD8 && signature[2] == 0xFF,
+                ".png" => read >= 8 && signature[..8].SequenceEqual(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }),
+                ".gif" => read >= 6 && (System.Text.Encoding.ASCII.GetString(signature[..6]) is "GIF87a" or "GIF89a"),
+                ".webp" => read >= 12 && System.Text.Encoding.ASCII.GetString(signature[..4]) == "RIFF" && System.Text.Encoding.ASCII.GetString(signature[8..12]) == "WEBP",
+                _ => false
+            };
         }
 
         private static async Task<byte[]> LeerBytesAsync(IFormFile archivo)

@@ -32,6 +32,10 @@
             <i class="bi bi-check-circle-fill"></i> @TempData["Exito"]
         </div>
     }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger rounded-3 mb-4">@TempData["Error"]</div>
+    }
 
     <div class="bg-white rounded-3 shadow-sm p-4">
         <div class="table-responsive">
@@ -86,10 +90,12 @@
                                                class="btn btn-sm btn-outline-primary rounded-2" title="Editar">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <a asp-action="CambiarEstado" asp-route-id="@usuario.IdUsuario"
-                                               class="btn btn-sm @(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "btn-outline-warning" : "btn-outline-success") rounded-2">
-                                                <i class="bi bi-toggle-@(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "on" : "off")"></i>
-                                            </a>
+                                            <form method="post" asp-action="CambiarEstado" asp-route-id="@usuario.IdUsuario">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm @(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "btn-outline-warning" : "btn-outline-success") rounded-2">
+                                                    <i class="bi bi-toggle-@(usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo" ? "on" : "off")"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     }
                                     else

@@ -53,14 +53,14 @@
                     <input type="hidden" asp-for="IdImagen" />
 
                     @* Si es edición y ya tiene imagen *@
-                    @if (esEdicion && Model.ImagenBase64 != null)
+                    @if (esEdicion && Model.ImagenUrl != null)
                     {
                         <div class="imagen-actual-box mb-4">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="badge-conteo"><i class="bi bi-image me-1"></i>Imagen Actual</span>
                             </div>
                             <div class="text-center">
-                                <img src="@Model.ImagenBase64" alt="@Model.Titulo" class="imagen-actual-preview" />
+                                <img src="@Model.ImagenUrl" alt="@Model.Titulo" class="imagen-actual-preview" />
                             </div>
                         </div>
                     }
@@ -92,7 +92,7 @@
                         <div id="previewContainer" class="preview-container mt-3" style="display:none;">
                             <div class="d-flex align-items-center justify-content-between mb-3">
                                 <span id="previewCount" class="badge-conteo"></span>
-                                <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none" onclick="limpiarSeleccion()">
+                                <button type="button" class="btn btn-sm btn-link text-danger text-decoration-none" data-clear-upload>
                                     <i class="bi bi-trash3 me-1"></i>Quitar todas
                                 </button>
                             </div>
@@ -162,7 +162,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.Items["CspNonce"]">
         const esEdicion = @(esEdicion ? "true" : "false");
         let dt = new DataTransfer();
         const inputArchivos = document.getElementById('archivos');
@@ -212,10 +212,10 @@
                 btnRemove.className = 'preview-card-remove';
                 btnRemove.title = 'Quitar esta imagen';
                 btnRemove.innerHTML = '<i class="bi bi-x-lg"></i>';
-                btnRemove.onclick = (e) => {
+                btnRemove.addEventListener('click', (e) => {
                     e.stopPropagation();
                     removerArchivo(index);
-                };
+                });
 
                 card.appendChild(img);
                 card.appendChild(info);
@@ -254,6 +254,8 @@
             inputArchivos.files = dt.files;
             actualizarPreviews();
         }
+
+        document.querySelector('[data-clear-upload]')?.addEventListener('click', limpiarSeleccion);
 
         if (dropzone) {
             dropzone.addEventListener('click', () => inputArchivos.click());

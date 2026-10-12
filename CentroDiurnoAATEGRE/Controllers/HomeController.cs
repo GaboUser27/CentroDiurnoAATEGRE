@@ -9,10 +9,10 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
 {
     public class HomeController : Controller
     {
-        // Nombre de la categoría de imágenes que se usará para mostrar
-        // el presupuesto/transparencia en "Quiénes Somos".
-        // Debe crearse esta categoría desde el panel administrativo
-        // (Imágenes > Categorías) y subir ahí la imagen del presupuesto.
+        // Nombre de la categorï¿½a de imï¿½genes que se usarï¿½ para mostrar
+        // el presupuesto/transparencia en "Quiï¿½nes Somos".
+        // Debe crearse esta categorï¿½a desde el panel administrativo
+        // (Imï¿½genes > Categorï¿½as) y subir ahï¿½ la imagen del presupuesto.
         private const string CATEGORIA_PRESUPUESTO = "Presupuesto";
 
         private readonly IAvisoService _avisoService;
@@ -41,7 +41,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             ViewBag.Avisos = await _avisoService.ObtenerVigentesAsync();
             ViewBag.Informacion = await _infoService.ObtenerPrimeraAsync();
             ViewBag.Imagenes = (await _imagenService.ObtenerConCategoriaAsync())
-                .Where(i => i.Imagen1 != null)
+                .Where(i => i.TieneImagen)
                 .OrderByDescending(i => i.FechaImagen)
                 .Take(5)
                 .ToList();
@@ -55,10 +55,10 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             ViewBag.Informacion = await _infoService.ObtenerPrimeraAsync();
 
             var imagenes = (await _imagenService.ObtenerConCategoriaAsync())
-                .Where(i => i.Imagen1 != null)
+                .Where(i => i.TieneImagen)
                 .ToList();
 
-            // Imágenes para el carrusel: todas las que NO son la del presupuesto.
+            // Imï¿½genes para el carrusel: todas las que NO son la del presupuesto.
             ViewBag.ImagenesCarrusel = imagenes
                 .Where(i => !EsCategoriaPresupuesto(i.IdCategoriaImagenNavigation?.Nombre))
                 .OrderByDescending(i => i.FechaImagen)
@@ -74,7 +74,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return View();
         }
 
-        // GET: /Home/Avisos  -> página pública con todos los avisos vigentes
+        // GET: /Home/Avisos  -> pï¿½gina pï¿½blica con todos los avisos vigentes
         public async Task<IActionResult> Avisos()
         {
             ViewData["ActivePage"] = "Avisos";
@@ -109,37 +109,32 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return View();
         }
 
-        public int ObtenerTotalAvisosActivos()
+        [AllowAnonymous]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error() => View("Error");
+        private async Task<int> ObtenerTotalAvisosActivosAsync()
         {
-            int total = 0;
-            var avisosActivos = _avisoService.ObtenerVigentesAsync();
-            if (avisosActivos != null)
-            {
-                foreach (var aviso in avisosActivos.Result)
-                {
-                    total++;
-                }
-            }
-            return total;
+            var avisosActivos = await _avisoService.ObtenerVigentesAsync();
+            return avisosActivos.Count();
         }
-
         // GET: /Home/Dashboard
-        [Authorize]
+        [Authorize(Roles = "Administrador,Colaborador,Empleado")]
         public async Task<IActionResult> Dashboard()
         {
             var avisos = await _avisoService.ObtenerTodosAsync();
             var imagenes = await _imagenService.ObtenerTodosAsync();
             var cats = await _categoriaService.ObtenerTodosAsync();
-            var usuarios = await _usuarioService.ObtenerTodosAsync();
+            var esAdministrador = User.IsInRole("Administrador");
+            var usuarios = esAdministrador ? await _usuarioService.ObtenerTodosAsync() : null;
 
             // Solo los avisos marcados como activos: la tarjeta se llama
             // "Avisos activos" pero antes contaba el total de la tabla.
-            ViewBag.TotalAvisos = ObtenerTotalAvisosActivos();
+            ViewBag.TotalAvisos = await ObtenerTotalAvisosActivosAsync();
             ViewBag.TotalImagenes = imagenes.Count();
             ViewBag.TotalCategorias = cats.Count();
-            ViewBag.TotalUsuarios = usuarios.Count();
+            ViewBag.TotalUsuarios = usuarios?.Count();
             ViewBag.AvisosRecientes = avisos.Take(5);
-            ViewBag.Usuarios = usuarios.Take(5);
+            ViewBag.Usuarios = usuarios?.Take(5);
 
             return View();
         }

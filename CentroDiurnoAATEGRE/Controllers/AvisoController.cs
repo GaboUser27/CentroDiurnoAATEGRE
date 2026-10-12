@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CentroDiurnoAATEGRE.Application.DTOs;
 using CentroDiurnoAATEGRE.Application.Services.Interfaces;
 using CentroDiurnoAATEGRE.Infraestructure.Models;
@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CentroDiurnoAATEGRE.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Colaborador,Empleado")]
     public class AvisoController : Controller
     {
         private readonly IAvisoService _avisoService;
@@ -65,6 +65,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Eliminar(int id)
         {
             await _avisoService.EliminarAsync(id);

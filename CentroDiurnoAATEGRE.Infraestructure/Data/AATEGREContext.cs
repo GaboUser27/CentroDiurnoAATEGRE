@@ -132,6 +132,8 @@ public partial class AATEGREContext : DbContext
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .IsUnicode(false);
+            entity.Property(e => e.IntentosFallidos).HasDefaultValue(0);
+            entity.Property(e => e.BloqueadoHasta).HasColumnType("datetime2");
 
             entity.HasOne(d => d.IdEstadoUsuarioNavigation).WithMany(p => p.Usuario)
                 .HasForeignKey(d => d.IdEstadoUsuario)

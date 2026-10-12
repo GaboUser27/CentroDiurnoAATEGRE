@@ -36,5 +36,24 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task RegistrarIntentoFallidoAsync(int idUsuario, int limiteIntentos, DateTime bloqueadoHasta)
+        {
+            await _context.Usuario
+                .Where(u => u.IdUsuario == idUsuario)
+                .ExecuteUpdateAsync(update => update
+                    .SetProperty(u => u.IntentosFallidos, u => u.IntentosFallidos + 1)
+                    .SetProperty(u => u.BloqueadoHasta,
+                        u => u.IntentosFallidos + 1 >= limiteIntentos ? bloqueadoHasta : u.BloqueadoHasta));
+        }
+
+        public async Task ReiniciarIntentosFallidosAsync(int idUsuario)
+        {
+            await _context.Usuario
+                .Where(u => u.IdUsuario == idUsuario)
+                .ExecuteUpdateAsync(update => update
+                    .SetProperty(u => u.IntentosFallidos, 0)
+                    .SetProperty(u => u.BloqueadoHasta, (DateTime?)null));
+        }
     }
 }

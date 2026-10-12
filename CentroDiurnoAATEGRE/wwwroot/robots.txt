@@ -11,6 +11,4 @@ Disallow: /CategoriaImagen/
 Disallow: /InformacionInstitucional/
 Disallow: /Home/Dashboard
 
-# IMPORTANTE: reemplazar este dominio por el dominio real una vez
-# que el sitio esté en producción.
 Sitemap: https://www.aategre.cr/sitemap.xml

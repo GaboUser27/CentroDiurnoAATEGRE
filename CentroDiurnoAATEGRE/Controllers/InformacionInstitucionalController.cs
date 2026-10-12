@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CentroDiurnoAATEGRE.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Colaborador,Empleado")]
     public class InformacionInstitucionalController : Controller
     {
         private readonly IInformacionInstitucionalService _infoService;

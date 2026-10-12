@@ -12,5 +12,7 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces
         Task<Usuario?> ObtenerPorCorreoAsync(string correo);
         Task<IEnumerable<Usuario>> ObtenerConRolesYEstadosAsync();
         Task CambiarEstadoAsync(int idUsuario, int idNuevoEstado);
+        Task RegistrarIntentoFallidoAsync(int idUsuario, int limiteIntentos, DateTime bloqueadoHasta);
+        Task ReiniciarIntentosFallidosAsync(int idUsuario);
     }
 }

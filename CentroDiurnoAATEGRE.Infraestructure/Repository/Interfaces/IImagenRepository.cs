@@ -11,5 +11,6 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces
     {
         Task<IEnumerable<Imagen>> ObtenerPorCategoriaAsync(int idCategoria);
         Task<IEnumerable<Imagen>> ObtenerConCategoriaAsync();
+        Task<byte[]?> ObtenerBytesImagenAsync(int id);
     }
 }

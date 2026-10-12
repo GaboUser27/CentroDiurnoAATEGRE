@@ -78,12 +78,10 @@
                                    class="btn-accion-icono editar" title="Editar categoría">
                                     <i class="bi bi-pencil-fill"></i>
                                 </a>
-                                <a asp-action="Eliminar" asp-route-id="@cat.IdCategoriaImagen"
-                                   class="btn-accion-icono eliminar"
-                                   onclick="return confirm('¿Está seguro de eliminar esta categoría?');"
-                                   title="Eliminar categoría">
-                                    <i class="bi bi-trash3-fill"></i>
-                                </a>
+                                <form method="post" asp-action="Eliminar" asp-route-id="@cat.IdCategoriaImagen" data-confirm="¿Está seguro de eliminar esta categoría?">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-accion-icono eliminar" title="Eliminar categoría"><i class="bi bi-trash3-fill"></i></button>
+                                </form>
                             </div>
                         </div>
                     </div>

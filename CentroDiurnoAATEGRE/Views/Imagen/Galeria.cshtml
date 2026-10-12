@@ -82,11 +82,15 @@
             {
                 <div class="col-sm-6 col-md-4 col-lg-3">
                     <div class="galeria-card-publica"
+                         role="button" tabindex="0"
+                         data-imagen="@img.ImagenUrl" data-titulo="@img.Titulo"
+                         data-descripcion="@img.Descripcion" data-fecha="@img.FechaImagen.ToString("dd MMMM, yyyy")"
+                         data-categoria="@img.IdCategoriaImagenNavigation?.Nombre"
                          data-bs-toggle="modal" data-bs-target="#modalImagen"
-                         onclick="verImagen('@img.ImagenBase64','@Html.Raw(Html.Encode(img.Titulo))','@Html.Raw(Html.Encode(img.Descripcion ?? ""))','@img.FechaImagen.ToString("dd MMMM, yyyy")','@(img.IdCategoriaImagenNavigation?.Nombre ?? "")')">
-                        @if (img.ImagenBase64 != null)
+                         >
+                        @if (img.ImagenUrl != null)
                         {
-                            <img src="@img.ImagenBase64" alt="@img.Titulo" class="galeria-card-img" loading="lazy" />
+                            <img src="@img.ImagenUrl" alt="@img.Titulo" class="galeria-card-img" loading="lazy" />
                         }
                         else
                         {
@@ -159,12 +163,12 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.Items["CspNonce"]">
         function verImagen(base64, titulo, descripcion, fecha, categoria) {
             document.getElementById('modalFoto').src = base64 || '';
             document.getElementById('modalTitulo').textContent = titulo;
             document.getElementById('modalDesc').textContent = descripcion || 'Sin descripción adicional.';
-            document.getElementById('modalFecha').innerHTML = `<i class="bi bi-calendar3 me-1"></i>${fecha}`;
+            document.getElementById('modalFecha').textContent = fecha;
             
             const catElem = document.getElementById('modalCategoria');
             if (categoria) {
@@ -174,5 +178,17 @@
                 catElem.style.display = 'none';
             }
         }
+
+        document.querySelectorAll('.galeria-card-publica').forEach(card => {
+            card.addEventListener('click', () => verImagen(
+                card.dataset.imagen, card.dataset.titulo, card.dataset.descripcion,
+                card.dataset.fecha, card.dataset.categoria));
+            card.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    card.click();
+                }
+            });
+        });
     </script>
 }

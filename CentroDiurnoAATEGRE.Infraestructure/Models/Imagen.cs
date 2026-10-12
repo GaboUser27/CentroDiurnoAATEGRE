@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CentroDiurnoAATEGRE.Infraestructure.Models;
 
@@ -16,6 +17,9 @@ public partial class Imagen
     public int IdCategoriaImagen { get; set; }
 
     public byte[]? Imagen1 { get; set; }
+
+    [NotMapped]
+    public bool TieneImagen { get; set; }
 
     public virtual CategoriaImagen IdCategoriaImagenNavigation { get; set; } = null!;
 }

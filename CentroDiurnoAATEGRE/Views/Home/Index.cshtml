@@ -209,7 +209,7 @@
                 }
                 @foreach (var img in imagenes)
                 {
-                    var base64 = img.ImagenBase64;
+                    var base64 = img.ImagenUrl;
 
                     <div class="galeria-item @(indiceImagen == 0 ? "grande" : "")">
                         @if (base64 != null)

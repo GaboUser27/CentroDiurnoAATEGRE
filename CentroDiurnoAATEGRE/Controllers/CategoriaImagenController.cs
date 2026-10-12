@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CentroDiurnoAATEGRE.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Colaborador,Empleado")]
     public class CategoriaImagenController : Controller
     {
         private readonly ICategoriaImagenService _categoriaService;
@@ -61,6 +61,7 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Eliminar(int id)
         {
             var eliminado = await _categoriaService.EliminarAsync(id);

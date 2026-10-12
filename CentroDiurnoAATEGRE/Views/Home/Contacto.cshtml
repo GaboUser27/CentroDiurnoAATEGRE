@@ -33,8 +33,8 @@
                         <div>
                             <p class="contacto-info-titulo">Teléfono</p>
                             <p class="contacto-info-dato">
-                                <a href="tel:@(info?.Telefono ?? "")" style="color:var(--texto-suave);">
-                                    @(info?.Telefono ?? "+506 2494-XXXX")
+                                <a href="tel:@(info?.Telefono ?? "+506 2444-3895")" style="color:var(--texto-suave);">
+                                    @(info?.Telefono ?? "+506 2444-3895")
                                 </a>
                             </p>
                         </div>
@@ -44,9 +44,14 @@
                         <div>
                             <p class="contacto-info-titulo">Correo electrónico</p>
                             <p class="contacto-info-dato">
-                                <a href="mailto:@(info?.Correo ?? "info@aategre.cr")" style="color:var(--texto-suave);">
-                                    @(info?.Correo ?? "info@aategre.cr")
-                                </a>
+                                @if (!string.IsNullOrWhiteSpace(info?.Correo))
+                                {
+                                    <a href="mailto:@info?.Correo" style="color:var(--texto-suave);">@info?.Correo</a>
+                                }
+                                else
+                                {
+                                    <span>Correo no configurado</span>
+                                }
                             </p>
                         </div>
                     </div>
@@ -58,18 +63,18 @@
                         </div>
                     </div>
                 </div>
-                @if (info?.Facebook != null || info?.Instagram != null)
+                @if (!string.IsNullOrWhiteSpace(info?.FacebookUrlSegura) || !string.IsNullOrWhiteSpace(info?.InstagramUrlSegura))
                 {
                     <div class="mt-4 d-flex gap-2 flex-wrap">
-                        @if (!string.IsNullOrEmpty(info?.Facebook))
+                        @if (!string.IsNullOrWhiteSpace(info?.FacebookUrlSegura))
                         {
-                            <a href="@info.Facebook" target="_blank" rel="noopener" class="rrss-btn fb">
+                            <a href="@info?.FacebookUrlSegura" target="_blank" rel="noopener noreferrer" class="rrss-btn fb">
                                 <i class="bi bi-facebook"></i>Facebook
                             </a>
                         }
-                        @if (!string.IsNullOrEmpty(info?.Instagram))
+                        @if (!string.IsNullOrWhiteSpace(info?.InstagramUrlSegura))
                         {
-                            <a href="@info.Instagram" target="_blank" rel="noopener" class="rrss-btn ig">
+                            <a href="@info?.InstagramUrlSegura" target="_blank" rel="noopener noreferrer" class="rrss-btn ig">
                                 <i class="bi bi-instagram"></i>Instagram
                             </a>
                         }

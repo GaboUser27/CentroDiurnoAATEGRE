@@ -43,9 +43,9 @@
                 <div class="col-sm-6 col-md-4 col-lg-3">
                     <div class="bg-white rounded-3 shadow-sm overflow-hidden h-100">
                         <div style="height:180px;background:var(--gris);overflow:hidden;position:relative;">
-                            @if (img.ImagenBase64 != null)
+                            @if (img.ImagenUrl != null)
                             {
-                                <img src="@img.ImagenBase64" alt="@img.Titulo"
+                                <img src="@img.ImagenUrl" alt="@img.Titulo"
                                      style="width:100%;height:100%;object-fit:cover;" />
                             }
                             else
@@ -69,11 +69,10 @@
                                    class="btn btn-sm btn-outline-primary rounded-2 flex-fill text-center">
                                     <i class="bi bi-pencil me-1"></i>Editar
                                 </a>
-                                <a asp-action="Eliminar" asp-route-id="@img.IdImagen"
-                                   class="btn btn-sm btn-outline-danger rounded-2"
-                                   onclick="return confirm('¿Eliminar esta imagen?')">
-                                    <i class="bi bi-trash"></i>
-                                </a>
+                                <form method="post" asp-action="Eliminar" asp-route-id="@img.IdImagen" data-confirm="¿Eliminar esta imagen?">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-2"><i class="bi bi-trash"></i></button>
+                                </form>
                             </div>
                         </div>
                     </div>

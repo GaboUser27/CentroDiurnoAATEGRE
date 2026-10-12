@@ -17,7 +17,9 @@ namespace CentroDiurnoAATEGRE.Application.Profiles
             // Entidad → DTO
             CreateMap<Imagen, ImagenDTO>()
                 .ForMember(d => d.IdCategoriaImagenNavigation,
-                    o => o.MapFrom(s => s.IdCategoriaImagenNavigation));
+                    o => o.MapFrom(s => s.IdCategoriaImagenNavigation))
+                .ForMember(d => d.TieneImagen,
+                    o => o.MapFrom(s => s.TieneImagen || s.Imagen1 != null));
 
             // DTO → Entidad
             CreateMap<ImagenDTO, Imagen>()

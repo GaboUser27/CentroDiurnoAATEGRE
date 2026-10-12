@@ -14,6 +14,10 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
 {
     public class UsuarioService : IUsuarioService
     {
+        private const int MaxIntentosFallidos = 5;
+        private static readonly TimeSpan DuracionBloqueo = TimeSpan.FromMinutes(15);
+        // Hash BCrypt válido usado para mantener un costo comparable cuando el correo no existe.
+        private const string HashDummy = "$2a$11$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
         private readonly IUsuarioRepository _repo;
         private readonly IGenericRepository<Rol> _rolRepo;
         private readonly IMapper _mapper;
@@ -43,12 +47,20 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
         public async Task<UsuarioDTO?> ValidarLoginAsync(string correo, string contrasena)
         {
             var usuario = await _repo.ObtenerPorCorreoAsync(correo);
-            if (usuario == null) return null;
-            if (usuario.IdEstadoUsuarioNavigation?.Nombre != "Activo") return null;
+            if (usuario == null)
+            {
+                BCrypt.Net.BCrypt.Verify(contrasena, HashDummy);
+                return null;
+            }
+
+            if (usuario.IdEstadoUsuarioNavigation?.Nombre != "Activo"
+                || usuario.BloqueadoHasta > DateTime.UtcNow)
+            {
+                BCrypt.Net.BCrypt.Verify(contrasena, HashDummy);
+                return null;
+            }
 
             bool esValida = false;
-
-            // Verificar si la contraseña almacenada está en formato hash BCrypt
             if (!string.IsNullOrEmpty(usuario.Contrasena) &&
                 (usuario.Contrasena.StartsWith("$2a$") || usuario.Contrasena.StartsWith("$2b$") || usuario.Contrasena.StartsWith("$2y$")))
             {
@@ -59,21 +71,23 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
                 catch
                 {
                     esValida = false;
+                    BCrypt.Net.BCrypt.Verify(contrasena, HashDummy);
                 }
             }
             else
             {
-                // Compatibilidad hacia atrás para contraseñas existentes antes de la encriptación
-                if (usuario.Contrasena == contrasena)
-                {
-                    esValida = true;
-                    // Auto-migrar la contraseña a hash BCrypt en la base de datos
-                    usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(contrasena);
-                    await _repo.ActualizarAsync(usuario);
-                }
+                BCrypt.Net.BCrypt.Verify(contrasena, HashDummy);
             }
 
-            if (!esValida) return null;
+            if (!esValida)
+            {
+                await _repo.RegistrarIntentoFallidoAsync(
+                    usuario.IdUsuario, MaxIntentosFallidos, DateTime.UtcNow.Add(DuracionBloqueo));
+                return null;
+            }
+
+            if (usuario.IntentosFallidos > 0 || usuario.BloqueadoHasta.HasValue)
+                await _repo.ReiniciarIntentosFallidosAsync(usuario.IdUsuario);
 
             return _mapper.Map<UsuarioDTO>(usuario);
         }

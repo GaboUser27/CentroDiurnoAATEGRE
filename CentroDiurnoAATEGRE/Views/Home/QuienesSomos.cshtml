@@ -1,4 +1,4 @@
-﻿@using CentroDiurnoAATEGRE.Application.DTOs
+@using CentroDiurnoAATEGRE.Application.DTOs
 @{
     ViewData["Title"] = "Quiénes Somos";
     ViewData["ActivePage"] = "Quienes";
@@ -32,10 +32,10 @@
                 </p>
                 <h2 class="seccion-titulo">@(info?.Titulo ?? "AATEGRE Centro Diurno")</h2>
                 <div class="linea-acento izquierda mb-4"></div>
-                <div style="color:var(--texto-suave);font-size:1.05rem;line-height:1.85;">
+                <div style="color:var(--texto-suave);font-size:1.05rem;line-height:1.85;white-space:pre-line;">
                     @if (info?.Contenido != null)
                     {
-                        @Html.Raw(info.Contenido.Replace("\n", "<br/>"))
+                        @info.Contenido
                     }
                     else
                     {
@@ -155,7 +155,7 @@
                     @foreach (var img in imagenesCarrusel)
                     {
                         <div class="carousel-item @(idx == 0 ? "active" : "")">
-                            <img src="@img.ImagenBase64" class="d-block w-100"
+                            <img src="@img.ImagenUrl" class="d-block w-100"
                                  style="max-height:480px;object-fit:cover;" alt="@img.Titulo">
                             @if (!string.IsNullOrWhiteSpace(img.Titulo) || !string.IsNullOrWhiteSpace(img.Descripcion))
                             {
@@ -243,7 +243,7 @@
                 {
                     <div class="col-md-8">
                         <div class="bg-white rounded-3 shadow-sm p-3 text-center">
-                            <img src="@img.ImagenBase64" alt="@img.Titulo" class="img-fluid rounded" />
+                            <img src="@img.ImagenUrl" alt="@img.Titulo" class="img-fluid rounded" />
                             @if (!string.IsNullOrWhiteSpace(img.Titulo))
                             {
                                 <p class="mt-3 mb-0 fw-semibold">@img.Titulo</p>

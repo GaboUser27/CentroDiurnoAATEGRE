@@ -26,6 +26,7 @@
                 <form method="post" asp-action="@(esEdicion ? "Editar" : "Crear")"
                       asp-route-id="@Model.IdUsuario" class="form-admin">
                     @Html.AntiForgeryToken()
+                    <div asp-validation-summary="All" class="text-danger mb-3"></div>
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label" asp-for="Nombre">
@@ -67,9 +68,9 @@
                                            type="password"
                                            id="pwdField"
                                            class="form-control"
-                                           placeholder="Mínimo 6 caracteres"
+                                           placeholder="Mínimo 12 caracteres"
                                            required
-                                           minlength="6" />
+                                           minlength="12" />
                                 }
                                 else
                                 {
@@ -78,7 +79,7 @@
                                            id="pwdField"
                                            class="form-control"
                                            placeholder="Nueva contraseña (opcional)"
-                                           minlength="6" />
+                                           minlength="12" />
                                 }
                                 <button class="btn btn-outline-secondary" type="button" id="togglePwd"
                                         style="border-radius:0 10px 10px 0;border-color:var(--gris-borde);">
@@ -113,7 +114,7 @@
 </div>
 
 @section Scripts {
-    <script>
+    <script nonce="@Context.Items["CspNonce"]">
         document.getElementById('togglePwd')?.addEventListener('click', function () {
             const pwd = document.getElementById('pwdField');
             const icon = document.getElementById('eyeIcon');

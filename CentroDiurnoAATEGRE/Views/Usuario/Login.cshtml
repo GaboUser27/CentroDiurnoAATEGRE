@@ -79,7 +79,7 @@
         </div>
     </div>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script nonce="@Context.Items["CspNonce"]">
         document.getElementById('togglePwd').addEventListener('click', function () {
             const pwd = document.getElementById('contrasena');
             const icon = document.getElementById('eyeIcon');

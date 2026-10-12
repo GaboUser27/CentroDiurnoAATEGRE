@@ -17,6 +17,10 @@ public partial class Usuario
 
     public int IdEstadoUsuario { get; set; }
 
+    public int IntentosFallidos { get; set; }
+
+    public DateTime? BloqueadoHasta { get; set; }
+
     public virtual EstadoUsuario IdEstadoUsuarioNavigation { get; set; } = null!;
 
     public virtual Rol IdRolNavigation { get; set; } = null!;

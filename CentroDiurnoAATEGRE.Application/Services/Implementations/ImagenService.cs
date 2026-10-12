@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +24,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
 
         public async Task<IEnumerable<ImagenDTO>> ObtenerTodosAsync()
         {
-            var imagenes = await _repo.ObtenerTodosAsync();
+            var imagenes = await _repo.ObtenerConCategoriaAsync();
             return _mapper.Map<IEnumerable<ImagenDTO>>(imagenes);
         }
 
@@ -45,6 +45,8 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
             var imagen = await _repo.ObtenerPorIdAsync(id);
             return imagen == null ? null : _mapper.Map<ImagenDTO>(imagen);
         }
+
+        public Task<byte[]?> ObtenerBytesImagenAsync(int id) => _repo.ObtenerBytesImagenAsync(id);
 
         public async Task CrearAsync(ImagenDTO dto, byte[]? imagenBytes)
         {
