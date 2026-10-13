@@ -156,8 +156,7 @@
                     @foreach (var img in imagenesCarrusel)
                     {
                         <div class="carousel-item @(idx == 0 ? "active" : "")">
-                            <img src="@img.ImagenUrl" class="d-block w-100"
-                                 style="max-height:480px;object-fit:cover;" alt="@img.Titulo">
+                            <img src="@img.ImagenUrl" class="d-block w-100 h-auto" alt="@img.Titulo">
                             @if (!string.IsNullOrWhiteSpace(img.Titulo) || !string.IsNullOrWhiteSpace(img.Descripcion))
                             {
                                 <div class="carousel-caption d-none d-md-block"

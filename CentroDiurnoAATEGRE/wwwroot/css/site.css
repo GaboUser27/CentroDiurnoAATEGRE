@@ -2225,10 +2225,10 @@ img {
         }
 
     .hero-panel {
-        padding: 1.25rem 1rem; /* Padding ultra-compacto para que no apriete los textos */
+        padding: 1.25rem 1rem;
         border-radius: 16px;
-        max-width: 100%;
-        margin: 0 0.5rem; /* Evitamos que toque los bordes del dispositivo */
+        max-width: calc(100% - 1rem); /* Restamos el espacio para los márgenes */
+        margin: 0 auto; /* Centrado automático */
     }
 
     .hero-card-flotante {
