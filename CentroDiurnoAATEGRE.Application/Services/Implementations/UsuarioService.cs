@@ -15,6 +15,7 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
     public class UsuarioService : IUsuarioService
     {
         private const int MaxIntentosFallidos = 5;
+        private const int WorkFactor = 12;
         private static readonly TimeSpan DuracionBloqueo = TimeSpan.FromMinutes(15);
         // Hash BCrypt válido usado para mantener un costo comparable cuando el correo no existe.
         private const string HashDummy = "$2a$11$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
@@ -40,8 +41,27 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
 
         public async Task<UsuarioDTO?> ObtenerPorIdAsync(int id)
         {
-            var usuario = await _repo.ObtenerPorIdAsync(id);
+            // Incluye rol y estado: los controladores los usan para proteger al último administrador.
+            var usuario = await _repo.ObtenerPorIdConRolYEstadoAsync(id);
             return usuario == null ? null : _mapper.Map<UsuarioDTO>(usuario);
+        }
+
+        public Task<bool> ExisteCorreoAsync(string correo, int? excluirIdUsuario = null) =>
+            _repo.ExisteCorreoAsync(correo.Trim(), excluirIdUsuario);
+
+        /// <summary>Devuelve (en UTC) hasta cuándo está bloqueada la cuenta, o null si no lo está.</summary>
+        public async Task<DateTime?> ObtenerBloqueoActivoAsync(string correo)
+        {
+            var hasta = await _repo.ObtenerBloqueadoHastaAsync(correo);
+            return hasta.HasValue && hasta.Value > DateTime.UtcNow ? hasta : null;
+        }
+
+        public async Task<bool> SesionVigenteAsync(int idUsuario, string rol)
+        {
+            var usuario = await _repo.ObtenerPorIdConRolYEstadoAsync(idUsuario);
+            return usuario != null
+                && usuario.IdEstadoUsuarioNavigation?.Nombre == "Activo"
+                && string.Equals(usuario.IdRolNavigation?.Nombre, rol, StringComparison.Ordinal);
         }
 
         public async Task<UsuarioDTO?> ValidarLoginAsync(string correo, string contrasena)
@@ -58,6 +78,15 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
             {
                 BCrypt.Net.BCrypt.Verify(contrasena, HashDummy);
                 return null;
+            }
+
+            // Si el bloqueo ya venció, se reinicia el contador: de lo contrario el primer
+            // fallo posterior volvería a bloquear la cuenta de inmediato.
+            if (usuario.BloqueadoHasta.HasValue)
+            {
+                await _repo.ReiniciarIntentosFallidosAsync(usuario.IdUsuario);
+                usuario.IntentosFallidos = 0;
+                usuario.BloqueadoHasta = null;
             }
 
             bool esValida = false;
@@ -95,9 +124,10 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
         public async Task CrearAsync(UsuarioDTO dto)
         {
             var usuario = _mapper.Map<Usuario>(dto);
+            usuario.Correo = dto.Correo.Trim();
             if (!string.IsNullOrWhiteSpace(dto.Contrasena))
             {
-                usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena);
+                usuario.Contrasena = BCrypt.Net.BCrypt.HashPassword(dto.Contrasena, WorkFactor);
             }
             await _repo.AgregarAsync(usuario);
         }
@@ -111,8 +141,12 @@ namespace CentroDiurnoAATEGRE.Application.Services.Implementations
             _mapper.Map(dto, usuario);
 
             usuario.Contrasena = !string.IsNullOrWhiteSpace(dto.Contrasena)
-                ? BCrypt.Net.BCrypt.HashPassword(dto.Contrasena)
+                ? BCrypt.Net.BCrypt.HashPassword(dto.Contrasena, WorkFactor)
                 : contrasenaActual;
+
+            // Guardar desde el panel de administración también desbloquea la cuenta.
+            usuario.IntentosFallidos = 0;
+            usuario.BloqueadoHasta = null;
 
             await _repo.ActualizarAsync(usuario);
         }

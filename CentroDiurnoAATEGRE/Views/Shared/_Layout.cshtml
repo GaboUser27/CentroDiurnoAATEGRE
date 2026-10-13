@@ -10,7 +10,18 @@
         ?? "AATEGRE Centro Diurno brinda cuidado integral, actividades y calidez humana para adultos mayores en Grecia, Alajuela, Costa Rica.";
     var cspNonce = Context.Items["CspNonce"] as string;
     var metaUrlBase = (Context.RequestServices.GetRequiredService<IConfiguration>()["PublicBaseUrl"] ?? "https://www.aategre.cr").TrimEnd('/');
-    var metaUrlActual = $"{metaUrlBase}{Context.Request.Path}";
+    // Solo las páginas públicas se indexan; panel, formularios, errores y acceso denegado no.
+    var rutaControlador = Context.Request.RouteValues["controller"]?.ToString() ?? "";
+    var rutaAccion = Context.Request.RouteValues["action"]?.ToString() ?? "";
+    // URL canónica construida desde controlador/acción (no desde la ruta tal como llegó),
+    // para que siempre coincida con sitemap.xml aunque se entre por /Home/Index o con otra capitalización.
+    var metaUrlActual = (rutaControlador == "Home" && rutaAccion == "Index")
+        ? $"{metaUrlBase}/"
+        : $"{metaUrlBase}/{rutaControlador}/{rutaAccion}";
+    var esPaginaPublica =
+        (rutaControlador == "Home" && rutaAccion is "Index" or "QuienesSomos" or "Avisos" or "Contacto" or "Terminos")
+        || (rutaControlador == "Imagen" && rutaAccion == "Galeria");
+    var metaRobots = esPaginaPublica ? "index, follow" : "noindex, nofollow";
     var metaImagen = $"{metaUrlBase}/images/logo_AATEGRE-sin-fondo.png";
 }
 <!DOCTYPE html>
@@ -24,8 +35,11 @@
     <meta name="description" content="@metaDescripcion" />
     <meta name="keywords" content="centro diurno, adultos mayores, cuidado de adultos mayores, Grecia, Alajuela, Costa Rica, AATEGRE, hogar de día" />
     <meta name="author" content="AATEGRE Centro Diurno" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="@metaUrlActual" />
+    <meta name="robots" content="@metaRobots" />
+    @if (esPaginaPublica)
+    {
+        <link rel="canonical" href="@metaUrlActual" />
+    }
 
     <!-- Open Graph (Facebook, WhatsApp, LinkedIn, etc.) -->
     <meta property="og:type" content="website" />

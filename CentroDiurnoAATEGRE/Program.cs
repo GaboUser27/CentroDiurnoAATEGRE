@@ -9,13 +9,39 @@ using CentroDiurnoAATEGRE.Web.BackgroundServices;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
 using System.Security.Cryptography;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc;
 
 var ejecutarMigracionContrasenas = args.Contains("--migrate-legacy-passwords", StringComparer.OrdinalIgnoreCase);
 var builder = WebApplication.CreateBuilder(args.Where(arg =>
     !string.Equals(arg, "--migrate-legacy-passwords", StringComparison.OrdinalIgnoreCase)).ToArray());
 
 // MVC
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // Defensa en profundidad: todo POST/PUT/DELETE exige token antiforgery,
+    // aunque en el futuro alguien olvide el atributo en una acción nueva.
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+});
+
+// Las claves de Data Protection deben persistir en disco; si no, cada reciclaje
+// del proceso en el hosting invalida sesiones, TempData y tokens antiforgery.
+var keysPath = Path.Combine(builder.Environment.ContentRootPath, "App_Data", "keys");
+Directory.CreateDirectory(keysPath);
+builder.Services.AddDataProtection()
+    .SetApplicationName("AATEGRE.CentroDiurno")
+    .PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+
+// Puerto HTTPS explícito para que UseHttpsRedirection funcione detrás de IIS.
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
+    if (!builder.Environment.IsDevelopment())
+        options.HttpsPort = 443; // en desarrollo se usa el puerto de launchSettings
+});
 
 // Rate limiting specifically for login attempts. Use a stable client IP only;
 // configure trusted forwarded headers in hosting before relying on this behind a proxy.
@@ -93,6 +119,27 @@ builder.Services.AddAuthentication("CookieAuth")
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
         options.SlidingExpiration = true;
         options.Cookie.IsEssential = true;
+        // Revalida en cada petición que el usuario siga activo y conserve el mismo rol,
+        // para que desactivar o cambiar de rol a alguien surta efecto de inmediato.
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = async context =>
+            {
+                var idClaim = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                var rolClaim = context.Principal?.FindFirstValue(ClaimTypes.Role);
+                var valido = false;
+                if (int.TryParse(idClaim, out var idUsuario) && rolClaim != null)
+                {
+                    var usuarioService = context.HttpContext.RequestServices.GetRequiredService<IUsuarioService>();
+                    valido = await usuarioService.SesionVigenteAsync(idUsuario, rolClaim);
+                }
+                if (!valido)
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync("CookieAuth");
+                }
+            }
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -102,16 +149,6 @@ builder.Services.AddAntiforgery(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Strict;
-});
-
-// Sesión
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    options.Cookie.SameSite = SameSiteMode.Lax;
-    options.Cookie.IsEssential = true;
 });
 
 var app = builder.Build();
@@ -139,6 +176,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?codigo={0}");
 
 app.Use(async (context, next) =>
 {
@@ -158,11 +196,27 @@ app.Use(async (context, next) =>
 });
 app.Use(async (context, next) =>
 {
-    if (string.Equals(context.Request.Host.Host, "www.aategre.cr", StringComparison.OrdinalIgnoreCase))
+    // Redirige el dominio sin "www" al dominio canónico (www.aategre.cr).
+    if (string.Equals(context.Request.Host.Host, "aategre.cr", StringComparison.OrdinalIgnoreCase))
     {
         var canonicalUrl = $"https://www.aategre.cr{context.Request.PathBase}{context.Request.Path}{context.Request.QueryString}";
         context.Response.Redirect(canonicalUrl, permanent: true);
         return;
+    }
+
+    // El panel administrativo y el login nunca deben indexarse.
+    var ruta = context.Request.Path;
+    if (ruta.StartsWithSegments("/Usuario", StringComparison.OrdinalIgnoreCase)
+        || ruta.StartsWithSegments("/Aviso", StringComparison.OrdinalIgnoreCase)
+        || ruta.StartsWithSegments("/CategoriaImagen", StringComparison.OrdinalIgnoreCase)
+        || ruta.StartsWithSegments("/InformacionInstitucional", StringComparison.OrdinalIgnoreCase)
+        || ruta.StartsWithSegments("/Home/Dashboard", StringComparison.OrdinalIgnoreCase)
+        || ruta.StartsWithSegments("/Imagen/Index", StringComparison.OrdinalIgnoreCase)
+        || ruta.StartsWithSegments("/Imagen/Formulario", StringComparison.OrdinalIgnoreCase)
+        || ruta.StartsWithSegments("/Imagen/Crear", StringComparison.OrdinalIgnoreCase)
+        || ruta.StartsWithSegments("/Imagen/Editar", StringComparison.OrdinalIgnoreCase))
+    {
+        context.Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
     }
     await next();
 });
@@ -172,15 +226,9 @@ app.UseRouting();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// Crear carpeta uploads si no existe
-var uploadsPath = Path.Combine(app.Environment.WebRootPath, "uploads");
-if (!Directory.Exists(uploadsPath))
-    Directory.CreateDirectory(uploadsPath);
 
 app.Run();

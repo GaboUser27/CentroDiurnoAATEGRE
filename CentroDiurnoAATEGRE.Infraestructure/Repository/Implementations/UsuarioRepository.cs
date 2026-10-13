@@ -20,6 +20,26 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Implementations
                 .Include(u => u.IdEstadoUsuarioNavigation)
                 .FirstOrDefaultAsync(u => u.Correo == correo);
 
+        public async Task<Usuario?> ObtenerPorIdConRolYEstadoAsync(int id) =>
+            await _context.Usuario
+                .AsNoTracking()
+                .Include(u => u.IdRolNavigation)
+                .Include(u => u.IdEstadoUsuarioNavigation)
+                .FirstOrDefaultAsync(u => u.IdUsuario == id);
+
+        // Sin tracking: RegistrarIntentoFallidoAsync actualiza con ExecuteUpdate (directo en BD),
+        // así que una entidad ya rastreada en este scope tendría el valor viejo.
+        public async Task<DateTime?> ObtenerBloqueadoHastaAsync(string correo) =>
+            await _context.Usuario
+                .AsNoTracking()
+                .Where(u => u.Correo == correo)
+                .Select(u => u.BloqueadoHasta)
+                .FirstOrDefaultAsync();
+
+        public async Task<bool> ExisteCorreoAsync(string correo, int? excluirIdUsuario = null) =>
+            await _context.Usuario.AnyAsync(u => u.Correo == correo
+                && (excluirIdUsuario == null || u.IdUsuario != excluirIdUsuario));
+
         public async Task<IEnumerable<Usuario>> ObtenerConRolesYEstadosAsync() =>
             await _context.Usuario
                 .Include(u => u.IdRolNavigation)

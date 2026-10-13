@@ -40,29 +40,33 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         }
 
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken, EnableRateLimiting("login")]
-        public async Task<IActionResult> Login(UsuarioDTO dto)
+        public async Task<IActionResult> Login(LoginDTO dto)
         {
-            // El formulario de login solo envía Correo y Contraseña.
-            // El resto de campos de UsuarioDTO (Nombre, IdRol, etc.) son
-            // requeridos para el CRUD de usuarios, no para el login,
-            // así que se excluyen de la validación aquí.
-            ModelState.Remove(nameof(dto.Nombre));
-            ModelState.Remove(nameof(dto.IdRol));
-            ModelState.Remove(nameof(dto.IdEstadoUsuario));
-            ModelState.Remove(nameof(dto.Contrasena));
+            // LoginDTO solo contiene Correo y Contraseña, así que la validación
+            // no se ve afectada por los demás campos de UsuarioDTO.
+            dto.Correo = (dto.Correo ?? string.Empty).Trim();
 
             if (string.IsNullOrWhiteSpace(dto.Correo) || string.IsNullOrEmpty(dto.Contrasena) || !ModelState.IsValid)
             {
                 ViewBag.Error = "Correo o contraseña incorrectos, o cuenta inactiva.";
-                return View(dto);
+                return View(new LoginDTO { Correo = dto.Correo });
             }
 
-            var usuario = await _usuarioService.ValidarLoginAsync(dto.Correo, dto.Contrasena ?? string.Empty);
+            var usuario = await _usuarioService.ValidarLoginAsync(dto.Correo, dto.Contrasena);
 
             if (usuario == null)
             {
-                ViewBag.Error = "Correo o contraseña incorrectos, o cuenta inactiva.";
-                return View(dto);
+                var bloqueoHasta = await _usuarioService.ObtenerBloqueoActivoAsync(dto.Correo);
+                if (bloqueoHasta.HasValue)
+                {
+                    var minutos = Math.Max(1, (int)Math.Ceiling((bloqueoHasta.Value - DateTime.UtcNow).TotalMinutes));
+                    ViewBag.Error = $"Por seguridad, el acceso está bloqueado temporalmente por varios intentos fallidos. Intente de nuevo en {minutos} minuto{(minutos == 1 ? "" : "s")}.";
+                }
+                else
+                {
+                    ViewBag.Error = "Correo o contraseña incorrectos, o cuenta inactiva.";
+                }
+                return View(new LoginDTO { Correo = dto.Correo });
             }
 
             var claims = new List<Claim>
@@ -108,6 +112,9 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         {
             if (string.IsNullOrWhiteSpace(dto.Contrasena))
                 ModelState.AddModelError(nameof(dto.Contrasena), "La contraseña es requerida.");
+            dto.Correo = (dto.Correo ?? string.Empty).Trim();
+            if (dto.Correo.Length > 0 && await _usuarioService.ExisteCorreoAsync(dto.Correo))
+                ModelState.AddModelError(nameof(dto.Correo), "Ya existe un usuario con ese correo.");
             if (!ModelState.IsValid) { await CargarSelectsAsync(); return View("Formulario", dto); }
 
             await _usuarioService.CrearAsync(dto);
@@ -129,6 +136,9 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
         public async Task<IActionResult> Editar(int id, UsuarioDTO dto)
         {
             dto.IdUsuario = id;
+            dto.Correo = (dto.Correo ?? string.Empty).Trim();
+            if (dto.Correo.Length > 0 && await _usuarioService.ExisteCorreoAsync(dto.Correo, id))
+                ModelState.AddModelError(nameof(dto.Correo), "Ya existe otro usuario con ese correo.");
             var usuarioActual = await _usuarioService.ObtenerPorIdAsync(id);
             if (usuarioActual == null) return NotFound();
 

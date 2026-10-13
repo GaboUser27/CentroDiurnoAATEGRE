@@ -10,6 +10,9 @@ namespace CentroDiurnoAATEGRE.Infraestructure.Repository.Interfaces
     public interface IUsuarioRepository : IGenericRepository<Usuario>
     {
         Task<Usuario?> ObtenerPorCorreoAsync(string correo);
+        Task<Usuario?> ObtenerPorIdConRolYEstadoAsync(int id);
+        Task<DateTime?> ObtenerBloqueadoHastaAsync(string correo);
+        Task<bool> ExisteCorreoAsync(string correo, int? excluirIdUsuario = null);
         Task<IEnumerable<Usuario>> ObtenerConRolesYEstadosAsync();
         Task CambiarEstadoAsync(int idUsuario, int idNuevoEstado);
         Task RegistrarIntentoFallidoAsync(int idUsuario, int limiteIntentos, DateTime bloqueadoHasta);

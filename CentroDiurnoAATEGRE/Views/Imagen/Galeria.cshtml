@@ -1,6 +1,7 @@
 @model IEnumerable<CentroDiurnoAATEGRE.Application.DTOs.ImagenDTO>
 @{
     ViewData["Title"] = "Galería de Actividades";
+    ViewData["MetaDescription"] = "Galería de fotos de las actividades, celebraciones y el día a día de los adultos mayores en AATEGRE Centro Diurno, Grecia, Alajuela.";
     ViewData["ActivePage"] = "Actividades";
     var categorias = ViewBag.Categorias as IEnumerable<CentroDiurnoAATEGRE.Application.DTOs.CategoriaImagenDTO>;
 }
@@ -12,7 +13,7 @@
         <div class="hero-circulo hero-circulo-2"></div>
         <div class="hero-lila"></div>
     </div>
-    
+
     <div class="container text-center galeria-hero-contenido">
         <div class="hero-eyebrow d-inline-flex mb-3">
             <i class="bi bi-stars me-2"></i>Momentos Especiales
@@ -37,7 +38,7 @@
                 <i class="bi bi-funnel-fill me-1"></i>Explorar por categorías
             </p>
             <h3 class="galeria-filtros-titulo mb-4">Filtrar Actividades</h3>
-            
+
             <div class="d-flex flex-wrap justify-content-center gap-2">
                 <a href="@Url.Action("Galeria")"
                    class="categoria-chip @(ViewBag.CategoriaActual == null ? "activo" : "")">
@@ -86,8 +87,7 @@
                          data-imagen="@img.ImagenUrl" data-titulo="@img.Titulo"
                          data-descripcion="@img.Descripcion" data-fecha="@img.FechaImagen.ToString("dd MMMM, yyyy")"
                          data-categoria="@img.IdCategoriaImagenNavigation?.Nombre"
-                         data-bs-toggle="modal" data-bs-target="#modalImagen"
-                         >
+                         data-bs-toggle="modal" data-bs-target="#modalImagen">
                         @if (img.ImagenUrl != null)
                         {
                             <img src="@img.ImagenUrl" alt="@img.Titulo" class="galeria-card-img" loading="lazy" />
@@ -98,7 +98,7 @@
                                 <i class="bi bi-image"></i>
                             </div>
                         }
-                        
+
                         <div class="galeria-card-overlay">
                             <div class="d-flex justify-content-end">
                                 <span class="galeria-zoom-badge" title="Ampliar imagen">
@@ -169,7 +169,7 @@
             document.getElementById('modalTitulo').textContent = titulo;
             document.getElementById('modalDesc').textContent = descripcion || 'Sin descripción adicional.';
             document.getElementById('modalFecha').textContent = fecha;
-            
+
             const catElem = document.getElementById('modalCategoria');
             if (categoria) {
                 catElem.textContent = categoria;

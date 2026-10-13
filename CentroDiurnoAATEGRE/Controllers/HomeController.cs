@@ -111,7 +111,11 @@ namespace CentroDiurnoAATEGRE.Web.Controllers
 
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error() => View("Error");
+        public IActionResult Error(int? codigo = null)
+        {
+            ViewData["CodigoError"] = codigo;
+            return View("Error");
+        }
         private async Task<int> ObtenerTotalAvisosActivosAsync()
         {
             var avisosActivos = await _avisoService.ObtenerVigentesAsync();
